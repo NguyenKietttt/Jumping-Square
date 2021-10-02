@@ -7,7 +7,8 @@ using DG.Tweening;
 public class SquareMovement : MonoBehaviour
 {
     private readonly float X_FORCE = 2.5f;
-    private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
+    private readonly Vector3 ROTATE_LEFT_VECTOR = new Vector3(0, 0, 360.0f);
+    private readonly Vector3 ROTATE_RIGHT_VECTOR = new Vector3(0, 180.0f, 360.0f);
 
 
     [Header("Configs")]
@@ -16,7 +17,7 @@ public class SquareMovement : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private bool _isCollided;
+    private bool _isCollided, _isStartJump;
     private Rigidbody2D _squareRb;
     private Transform _cacheTransform;
 
@@ -34,16 +35,27 @@ public class SquareMovement : MonoBehaviour
 
         if (_isFailedConfig)
             enabled = false;
+
+        _isStartJump = true;
     }
 
     private void OnEnable()
     {
-        SquareCollision.OnBorderCollide += param => Jump(param);
+        SquareCollision.OnBorderCollide += param =>
+        {
+            CheckIsCollided(param);
+            Jump();
+        };
+
     }
 
     private void OnDisable()
     {
-        SquareCollision.OnBorderCollide -= param => Jump(param);
+        SquareCollision.OnBorderCollide -= param =>
+        {
+            CheckIsCollided(param);
+            Jump();
+        };
     }
 
 
@@ -66,22 +78,26 @@ public class SquareMovement : MonoBehaviour
             if (_isCollided)
             {
                 _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
-                Rotate360(ROTATE_VECTOR);
+                Rotate360(ROTATE_LEFT_VECTOR);
             }
             else
             {
                 _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
-                Rotate360(-ROTATE_VECTOR);
+                Rotate360(ROTATE_RIGHT_VECTOR);
             }
         }
     }
 
-    private void Jump(bool isCollied)
+    private void Jump()
     {
         if (_isFailedConfig)
             return;
 
-        _isCollided = isCollied;
+        if (_isStartJump)
+        {
+            _isStartJump = false;
+            return;
+        }
 
         // Jump to an exact height
         var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
@@ -92,13 +108,24 @@ public class SquareMovement : MonoBehaviour
         if (_isCollided)
         {
             _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
-            Rotate360(ROTATE_VECTOR);
+            Rotate360(ROTATE_LEFT_VECTOR);
         }
         else
         {
             _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
-            Rotate360(-ROTATE_VECTOR);
+            Rotate360(ROTATE_RIGHT_VECTOR);
         }
+    }
+
+    private void CheckIsCollided(bool isCollided)
+    {
+        _isCollided = isCollided;
+
+        if (_isStartJump)
+            if (_isCollided)
+                _cacheTransform.eulerAngles = Vector3.zero;
+            else
+                _cacheTransform.eulerAngles = Vector3.up * 180.0f;
     }
 
     private void Rotate360(Vector3 rotateVector)
