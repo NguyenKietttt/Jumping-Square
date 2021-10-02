@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: SquareData
   m_EditorClassIdentifier: 
   jumpHeight: 2
-  rotateDuration: 0.5
+  rotateDuration: 0.8
