@@ -5,6 +5,7 @@ public class SquareCollision : MonoBehaviour
 {
     public static event Action<bool> OnBorderCollide;
 
+
     private bool _isCollided;
 
 

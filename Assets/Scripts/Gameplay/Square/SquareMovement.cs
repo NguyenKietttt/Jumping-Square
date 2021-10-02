@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class SquareMovement : MonoBehaviour
 {
-    private const float X_FORCE = 2.5f;
+    private readonly float X_FORCE = 2.5f;
+    private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
 
 
     [Header("Configs")]
@@ -16,6 +18,7 @@ public class SquareMovement : MonoBehaviour
 
     private bool _isCollided;
     private Rigidbody2D _squareRb;
+    private Transform _cacheTransform;
 
 
     private void OnValidate()
@@ -44,6 +47,9 @@ public class SquareMovement : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Raise by InputManager in Herachy
+    /// </summary>
     public void Jump(InputAction.CallbackContext ctx)
     {
         if (_isFailedConfig)
@@ -58,9 +64,15 @@ public class SquareMovement : MonoBehaviour
             _squareRb.velocity = Vector2.zero;
 
             if (_isCollided)
+            {
                 _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
+                Rotate360(ROTATE_VECTOR);
+            }
             else
+            {
                 _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
+                Rotate360(-ROTATE_VECTOR);
+            }
         }
     }
 
@@ -78,13 +90,27 @@ public class SquareMovement : MonoBehaviour
         _squareRb.velocity = Vector2.zero;
 
         if (_isCollided)
+        {
             _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
+            Rotate360(ROTATE_VECTOR);
+        }
         else
+        {
             _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
+            Rotate360(-ROTATE_VECTOR);
+        }
+    }
+
+    private void Rotate360(Vector3 rotateVector)
+    {
+        _cacheTransform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.FastBeyond360)
+            .SetEase(Ease.OutSine);
     }
 
     private void CacheComponents()
     {
+        _cacheTransform = transform;
+
         _squareRb = GetComponent<Rigidbody2D>();
     }
 }
