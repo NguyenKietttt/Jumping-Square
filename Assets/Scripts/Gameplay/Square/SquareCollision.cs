@@ -9,6 +9,12 @@ public class SquareCollision : MonoBehaviour
     private bool _isCollided;
 
 
+    private void Start() 
+    {
+        _isCollided = RandomCollided();
+        OnBorderCollide?.Invoke(_isCollided);
+    }
+
     private void OnCollisionEnter2D(Collision2D other) 
     {
         if (other.gameObject.CompareTag("Border"))
@@ -17,5 +23,12 @@ public class SquareCollision : MonoBehaviour
 
            OnBorderCollide?.Invoke(_isCollided);
         }
+    }
+
+    private bool RandomCollided()
+    {
+        var result = (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
+
+        return result;
     }
 }
