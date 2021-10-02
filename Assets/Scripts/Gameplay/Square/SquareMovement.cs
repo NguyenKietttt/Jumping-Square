@@ -7,8 +7,7 @@ using DG.Tweening;
 public class SquareMovement : MonoBehaviour
 {
     private readonly float X_FORCE = 2.5f;
-    private readonly Vector3 ROTATE_LEFT_VECTOR = new Vector3(0, 0, 360.0f);
-    private readonly Vector3 ROTATE_RIGHT_VECTOR = new Vector3(0, 180.0f, 360.0f);
+    private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
 
 
     [Header("Configs")]
@@ -78,12 +77,12 @@ public class SquareMovement : MonoBehaviour
             if (_isCollided)
             {
                 _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
-                Rotate360(ROTATE_LEFT_VECTOR);
+                Rotate360(ROTATE_VECTOR);
             }
             else
             {
                 _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
-                Rotate360(ROTATE_RIGHT_VECTOR);
+                Rotate360(-ROTATE_VECTOR);
             }
         }
     }
@@ -108,29 +107,23 @@ public class SquareMovement : MonoBehaviour
         if (_isCollided)
         {
             _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
-            Rotate360(ROTATE_LEFT_VECTOR);
+            Rotate360(ROTATE_VECTOR);
         }
         else
         {
             _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
-            Rotate360(ROTATE_RIGHT_VECTOR);
+            Rotate360(-ROTATE_VECTOR);
         }
     }
 
     private void CheckIsCollided(bool isCollided)
     {
         _isCollided = isCollided;
-
-        if (_isStartJump)
-            if (_isCollided)
-                _cacheTransform.eulerAngles = Vector3.zero;
-            else
-                _cacheTransform.eulerAngles = Vector3.up * 180.0f;
     }
 
     private void Rotate360(Vector3 rotateVector)
     {
-        _cacheTransform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.FastBeyond360)
+        _cacheTransform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.WorldAxisAdd)
             .SetEase(Ease.OutSine);
     }
 
