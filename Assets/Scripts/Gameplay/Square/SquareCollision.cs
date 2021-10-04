@@ -12,6 +12,7 @@ public class SquareCollision : MonoBehaviour
     private void Start() 
     {
         _isCollided = RandomCollided();
+        
         OnBorderCollide?.Invoke(_isCollided);
     }
 

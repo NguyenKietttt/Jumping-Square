@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1198453382719236476}
   m_Layer: 0
   m_Name: Spike
-  m_TagString: Spike
+  m_TagString: OpenSpike
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -108,9 +108,9 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.25, y: 0.25}
-      - {x: -0.25, y: -0.25}
-      - {x: -0.22152615, y: -0.23926306}
-      - {x: 0.25002813, y: -0.004299164}
-      - {x: 0.25, y: 0.006958723}
-      - {x: -0.21758413, y: 0.23458505}
+    - - {x: -0.24029064, y: 0.2421093}
+      - {x: -0.23971677, y: -0.24110341}
+      - {x: -0.2188108, y: -0.22903752}
+      - {x: 0.24054837, y: -0.0004205685}
+      - {x: 0.24084806, y: 0.00009656092}
+      - {x: -0.21658754, y: 0.22943544}

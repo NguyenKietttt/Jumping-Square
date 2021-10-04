@@ -20,7 +20,7 @@ public class SpikeController : MonoBehaviour
 
 
     private List<Transform> _leftSpikes, _rightSpikes;
-    private int _spikesPerLevel = 3;
+    private int _spikesPerLevel = 2;
 
 
     private void OnValidate()
@@ -69,20 +69,18 @@ public class SpikeController : MonoBehaviour
 
     private void SpawnSpikes(List<Transform> spikes)
     {
+        int spikeIndex;
+
         for (int i = 0; i < _spikesPerLevel; i++)
         {
-            int preSpikeIndex = -1;
-            int spikeIndex;
-
             do
             {
                 spikeIndex = Random.Range(0, spikes.Count);
             }
-            while (spikeIndex == preSpikeIndex);
+            while (spikes[spikeIndex].tag == "OpenSpike");
 
+            spikes[spikeIndex].tag = "OpenSpike";
             spikes[spikeIndex].DOLocalMoveY(NEW_POSITION, _spikeSO.SpawnDeday);
-
-            preSpikeIndex = spikeIndex;
         }
     }
 
@@ -91,7 +89,10 @@ public class SpikeController : MonoBehaviour
         foreach (var spike in spikes)
         {
             if (spike.localPosition.y == NEW_POSITION)
+            {
+                spike.tag = "Spike";
                 spike.DOLocalMoveY(OLD_POSITION, _spikeSO.SpawnDeday);
+            }
         }
     }
 

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89f575fdf57750e40a618c54f949d901, type: 3}
   m_Name: SquareData
   m_EditorClassIdentifier: 
-  jumpHeight: 2
+  jumpHeight: 1.2
   rotateDuration: 0.8
