@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SpikeTrigger : MonoBehaviour
+public class SquareTrigger : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other) 
     {

@@ -2,11 +2,13 @@ using System.Collections;
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class SquareCollision : MonoBehaviour
 {
     public static event Action<bool> OnBorderCollideEvent;
 
 
+    private BoxCollider2D boxCollider2D;
     private bool _isCollided;
 
 
@@ -29,13 +31,19 @@ public class SquareCollision : MonoBehaviour
         }
     }
 
+
+    private void CacheComponents()
+    {
+        boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
+    }
+
     private IEnumerator CheckDoubleJump()
     {
-        gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        boxCollider2D.enabled = false;
 
         yield return new WaitForSeconds(0.2f);
 
-        gameObject.GetComponent<BoxCollider2D>().enabled = true;
+        boxCollider2D.enabled = true;
     }
 
     private bool RandomCollided()

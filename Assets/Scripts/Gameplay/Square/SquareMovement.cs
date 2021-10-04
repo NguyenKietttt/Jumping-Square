@@ -4,7 +4,7 @@ using DG.Tweening;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class SquareMovement : MonoBehaviour
+public class SquareMovement : StateBase
 {
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
 
@@ -15,8 +15,9 @@ public class SquareMovement : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private bool _isCollided, _isStartJump;
+    private bool _isAllowJump, _isFirstJump, _isCollided;
     private Rigidbody2D _squareRb;
+    private SpriteRenderer _spriteRenderer;
     private Transform _cacheTransform;
 
 
@@ -33,12 +34,13 @@ public class SquareMovement : MonoBehaviour
 
         if (_isFailedConfig)
             enabled = false;
-
-        _isStartJump = true;
     }
 
     private void OnEnable()
     {
+        StateController.OnTitleEvent += OnTitleMenu;
+        StateController.OnGameplayEvent += OnGameplay;
+
         SquareCollision.OnBorderCollideEvent += param =>
         {
             CheckIsCollided(param);
@@ -48,6 +50,9 @@ public class SquareMovement : MonoBehaviour
 
     private void OnDisable()
     {
+        StateController.OnTitleEvent -= OnTitleMenu;
+        StateController.OnGameplayEvent -= OnGameplay;
+
         SquareCollision.OnBorderCollideEvent -= param =>
         {
             CheckIsCollided(param);
@@ -56,12 +61,33 @@ public class SquareMovement : MonoBehaviour
     }
 
 
+    public override void OnTitleMenu()
+    {
+        _isAllowJump = false;
+
+        _spriteRenderer.enabled = false;
+        _squareRb.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    public override void OnGameplay()
+    {
+        _isAllowJump = true;
+        _isFirstJump = true;
+
+        _spriteRenderer.enabled = true;
+        _squareRb.bodyType = RigidbodyType2D.Dynamic;
+    }
+
+
     /// <summary>
-    /// Raise by InputManager in Herachy
+    /// Raise by InputManager in Hierarchy
     /// </summary>
     public void Jump(InputAction.CallbackContext ctx)
     {
         if (_isFailedConfig)
+            return;
+
+        if (!_isAllowJump)
             return;
 
         if (ctx.started)
@@ -90,9 +116,12 @@ public class SquareMovement : MonoBehaviour
         if (_isFailedConfig)
             return;
 
-        if (_isStartJump)
+        if (!_isAllowJump)
+            return;
+
+        if (_isFirstJump)
         {
-            _isStartJump = false;
+            _isFirstJump = false;
             return;
         }
 
@@ -128,7 +157,7 @@ public class SquareMovement : MonoBehaviour
     private void CacheComponents()
     {
         _cacheTransform = transform;
-
         _squareRb = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 }
