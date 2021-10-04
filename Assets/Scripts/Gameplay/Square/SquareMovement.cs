@@ -6,7 +6,6 @@ using DG.Tweening;
 [RequireComponent(typeof(BoxCollider2D))]
 public class SquareMovement : MonoBehaviour
 {
-    private readonly float X_FORCE = 2.5f;
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
 
 
@@ -40,17 +39,16 @@ public class SquareMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        SquareCollision.OnBorderCollide += param =>
+        SquareCollision.OnBorderCollideEvent += param =>
         {
             CheckIsCollided(param);
             Jump();
         };
-
     }
 
     private void OnDisable()
     {
-        SquareCollision.OnBorderCollide -= param =>
+        SquareCollision.OnBorderCollideEvent -= param =>
         {
             CheckIsCollided(param);
             Jump();
@@ -76,12 +74,12 @@ public class SquareMovement : MonoBehaviour
 
             if (_isCollided)
             {
-                _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
+                _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
                 Rotate360(ROTATE_VECTOR);
             }
             else
             {
-                _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
+                _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
                 Rotate360(-ROTATE_VECTOR);
             }
         }
@@ -106,12 +104,12 @@ public class SquareMovement : MonoBehaviour
 
         if (_isCollided)
         {
-            _squareRb.AddForce(new Vector2(-X_FORCE, jumpForce), ForceMode2D.Impulse);
+            _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
             Rotate360(ROTATE_VECTOR);
         }
         else
         {
-            _squareRb.AddForce(new Vector2(X_FORCE, jumpForce), ForceMode2D.Impulse);
+            _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
             Rotate360(-ROTATE_VECTOR);
         }
     }

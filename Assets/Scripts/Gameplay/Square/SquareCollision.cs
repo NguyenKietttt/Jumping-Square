@@ -1,9 +1,10 @@
+using System.Collections;
 using System;
 using UnityEngine;
 
 public class SquareCollision : MonoBehaviour
 {
-    public static event Action<bool> OnBorderCollide;
+    public static event Action<bool> OnBorderCollideEvent;
 
 
     private bool _isCollided;
@@ -13,7 +14,7 @@ public class SquareCollision : MonoBehaviour
     {
         _isCollided = RandomCollided();
         
-        OnBorderCollide?.Invoke(_isCollided);
+        OnBorderCollideEvent?.Invoke(_isCollided);
     }
 
     private void OnCollisionEnter2D(Collision2D other) 
@@ -22,8 +23,19 @@ public class SquareCollision : MonoBehaviour
         {
            _isCollided = !_isCollided;
 
-           OnBorderCollide?.Invoke(_isCollided);
+           OnBorderCollideEvent?.Invoke(_isCollided);
+
+           StartCoroutine(CheckDoubleJump());
         }
+    }
+
+    private IEnumerator CheckDoubleJump()
+    {
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
+
+        yield return new WaitForSeconds(0.2f);
+
+        gameObject.GetComponent<BoxCollider2D>().enabled = true;
     }
 
     private bool RandomCollided()

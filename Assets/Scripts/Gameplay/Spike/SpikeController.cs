@@ -18,9 +18,8 @@ public class SpikeController : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-
     private List<Transform> _leftSpikes, _rightSpikes;
-    private int _spikesPerLevel = 2;
+    private int _spikesPerLevel;
 
 
     private void OnValidate()
@@ -40,18 +39,46 @@ public class SpikeController : MonoBehaviour
 
         _leftSpikes = GetHolderChilds(_leftSpikeHolder);
         _rightSpikes = GetHolderChilds(_rightSpikeHolder);
+
+        _spikesPerLevel = 1;
     }
 
     private void OnEnable()
     {
-        SquareCollision.OnBorderCollide += param => MoveSelectedSpike(param);
+        SquareCollision.OnBorderCollideEvent += param => MoveSelectedSpike(param);
+        ScoreController.displayScoreEvent += param => SetSpikeSpawnedByScore(param);
     }
 
     private void OnDisable()
     {
-        SquareCollision.OnBorderCollide -= param => MoveSelectedSpike(param);
+        SquareCollision.OnBorderCollideEvent -= param => MoveSelectedSpike(param);
+        ScoreController.displayScoreEvent -= param => SetSpikeSpawnedByScore(param);
     }
 
+
+    private List<Transform> GetHolderChilds(GameObject holder)
+    {
+        var childs = new List<Transform>();
+
+        for (int i = 0; i < holder.transform.childCount; i++)
+        {
+            childs.Add(holder.transform.GetChild(i).transform);
+        }
+
+        return childs;
+    }
+
+    private void SetSpikeSpawnedByScore(int score)
+    {
+        if (score >= 5)
+            _spikesPerLevel = 2;
+        else if (score >= 10)
+            _spikesPerLevel = 3;
+        else if (score >= 15)
+            _spikesPerLevel = 4;
+        else
+            _spikesPerLevel = 1;
+    }
 
     private void MoveSelectedSpike(bool isCollided)
     {
@@ -80,7 +107,7 @@ public class SpikeController : MonoBehaviour
             while (spikes[spikeIndex].tag == "OpenSpike");
 
             spikes[spikeIndex].tag = "OpenSpike";
-            spikes[spikeIndex].DOLocalMoveY(NEW_POSITION, _spikeSO.SpawnDeday);
+            spikes[spikeIndex].DOLocalMoveY(NEW_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.InBack);
         }
     }
 
@@ -94,17 +121,5 @@ public class SpikeController : MonoBehaviour
                 spike.DOLocalMoveY(OLD_POSITION, _spikeSO.SpawnDeday);
             }
         }
-    }
-
-    private List<Transform> GetHolderChilds(GameObject holder)
-    {
-        var childs = new List<Transform>();
-
-        for (int i = 0; i < holder.transform.childCount; i++)
-        {
-            childs.Add(holder.transform.GetChild(i).transform);
-        }
-
-        return childs;
     }
 }
