@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Square Data", menuName = "SciptableObject/Square Data")]
+[CreateAssetMenu(fileName = "New Square Data", menuName = "SciptableObject/Gameplay/Square Data")]
 public class SquareSO : ScriptableObject
 {
     [Header("Movement")]
@@ -11,7 +11,6 @@ public class SquareSO : ScriptableObject
     #region Properties
 
     public float JumpHeight => jumpHeight;
-
     public float RotateDuration => rotateDuration;
 
     #endregion

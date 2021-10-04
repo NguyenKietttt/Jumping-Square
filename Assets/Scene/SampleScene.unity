@@ -171,8 +171,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 258ee5fdc9fe5f240864fbdca96aa773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spikeSO: {fileID: 11400000, guid: a01f36e7bd5b36344862012ad885e89a, type: 2}
   _leftSpikeHolder: {fileID: 2121223366}
   _rightSpikeHolder: {fileID: 66809190}
+  _isFailedConfig: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,6 +640,14 @@ PrefabInstance:
     - target: {fileID: 1267481574682130103, guid: f25dd159e1de8984ba4f9af4acafeee5, type: 3}
       propertyPath: m_Name
       value: LeftSpikes
+      objectReference: {fileID: 0}
+    - target: {fileID: 6873952760674141788, guid: f25dd159e1de8984ba4f9af4acafeee5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6873952761409324787, guid: f25dd159e1de8984ba4f9af4acafeee5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f25dd159e1de8984ba4f9af4acafeee5, type: 3}
