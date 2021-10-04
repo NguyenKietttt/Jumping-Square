@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2968e5fd811b004d8ae1297e8715de5, type: 3}
   m_Name: SpikeData
   m_EditorClassIdentifier: 
-  spawnDeday: 0.5
+  spawnDeday: 0.7
