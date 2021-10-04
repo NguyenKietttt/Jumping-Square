@@ -18,7 +18,6 @@ public class SpikeController : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-
     private List<Transform> _leftSpikes, _rightSpikes;
     private int _spikesPerLevel;
 

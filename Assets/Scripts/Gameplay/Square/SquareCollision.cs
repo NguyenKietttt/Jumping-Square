@@ -1,3 +1,4 @@
+using System.Collections;
 using System;
 using UnityEngine;
 
@@ -23,7 +24,18 @@ public class SquareCollision : MonoBehaviour
            _isCollided = !_isCollided;
 
            OnBorderCollideEvent?.Invoke(_isCollided);
+
+           StartCoroutine(CheckDoubleJump());
         }
+    }
+
+    private IEnumerator CheckDoubleJump()
+    {
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
+
+        yield return new WaitForSeconds(0.2f);
+
+        gameObject.GetComponent<BoxCollider2D>().enabled = true;
     }
 
     private bool RandomCollided()

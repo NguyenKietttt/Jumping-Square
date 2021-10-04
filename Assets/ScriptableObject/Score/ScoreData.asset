@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89f575fdf57750e40a618c54f949d901, type: 3}
-  m_Name: SquareData
+  m_Script: {fileID: 11500000, guid: 9059f54f57b1a514d86a59ed0d282ee1, type: 3}
+  m_Name: ScoreData
   m_EditorClassIdentifier: 
-  jumpHeight: 1.1
-  jumpLength: 3.5
-  rotateDuration: 0.8
+  rotateTime: 0.4
+  normalScore: {r: 0, g: 0, b: 0, a: 0.5019608}
+  milestoneScore: {r: 1, g: 0, b: 0, a: 0.5019608}
