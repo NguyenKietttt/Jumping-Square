@@ -10,6 +10,12 @@ public class SquareCollision : StateBase
 
     private BoxCollider2D boxCollider2D;
     private bool _isCollided;
+    
+
+    private void Awake() 
+    {
+        CacheComponents();
+    }
 
 
     private void OnEnable()
@@ -27,7 +33,7 @@ public class SquareCollision : StateBase
 
     public override void OnGameplay()
     {
-        _isCollided = RandomCollided();
+        _isCollided = RandomJumpDirection();
 
         OnBorderCollideEvent?.Invoke(_isCollided);
     }
@@ -60,7 +66,7 @@ public class SquareCollision : StateBase
         boxCollider2D.enabled = true;
     }
 
-    private bool RandomCollided()
+    private bool RandomJumpDirection()
     {
         var result = (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
 

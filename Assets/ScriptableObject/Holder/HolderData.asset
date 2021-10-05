@@ -14,5 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   holderShowDuration: 2
   holderShowEase: 30
-  spikeShowDuration: 1
+  spikeShowDuration: 0.5
   spikeShowEase: 5
+  holderHideDuration: 0.7
+  holderHideEase: 2
+  spikeHideDuration: 0

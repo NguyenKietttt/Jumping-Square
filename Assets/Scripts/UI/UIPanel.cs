@@ -10,6 +10,10 @@ public class UIPanel : StateBase
     [SerializeField] private GameObject _gameplayCanvas;
     [SerializeField] private RectTransform _gameplayPanel;
 
+    [Header("Gameplay HUD")]
+    [SerializeField] private GameObject _gameoverCanvas;
+    [SerializeField] private RectTransform _gameoverPanel;
+
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
@@ -22,11 +26,14 @@ public class UIPanel : StateBase
         CustomLogs.Instance.Warning(_gameplayCanvas == null, "gameplayCanvas is missing!!!");
         CustomLogs.Instance.Warning(_gameplayPanel == null, "gameplayPanel is missing!!!");
 
-        _isFailedConfig = _titleCanvas == null || _titlePanel == null || _gameplayCanvas == null 
-            || _gameplayPanel == null;
+        CustomLogs.Instance.Warning(_gameoverCanvas == null, "gameoverCanvas is missing!!!");
+        CustomLogs.Instance.Warning(_gameoverPanel == null, "gameoverPanel is missing!!!");
+
+        _isFailedConfig = _titleCanvas == null || _titlePanel == null || _gameplayCanvas == null
+            || _gameplayPanel == null || _gameoverCanvas == null || _gameoverPanel == null;
     }
 
-    private void Awake() 
+    private void Awake()
     {
         if (_isFailedConfig)
             enabled = false;
@@ -37,39 +44,59 @@ public class UIPanel : StateBase
         StateController.RaiseTitleEvent();
     }
 
-    private void OnEnable() 
+    private void OnEnable()
     {
         StateController.OnTitleEvent += OnTitleMenu;
         StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
+        StateController.OnGameplayEvent += OnGameplay;
+        
+        StateController.OnGameoverEvent += OnGameOver;
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         StateController.OnTitleEvent -= OnTitleMenu;
         StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
+        StateController.OnGameplayEvent -= OnGameplay;
+
+        StateController.OnGameoverEvent -= OnGameOver;
     }
 
 
     public override void OnTitleMenu()
     {
-        HideGameplayPanel();
-        ShowTitlePanel();
+        HideGameplayHUD();
+        HideGameoverHUD();
+
+        ShowTitleHUD();
     }
 
     public override void OnTitleToGameplay()
     {
-        HideTitlePanel();
+        HideTitleHUD();
+    }
+
+    public override void OnGameplay()
+    {
+        ShowGameplayHUD();
+    }
+
+    public override void OnGameOver()
+    {
+        HideGameplayHUD();
+
+        ShowGameoverHUD();
     }
 
 
     #region Title Panel
 
-    private void ShowTitlePanel()
+    private void ShowTitleHUD()
     {
         _titleCanvas.SetActive(true);
     }
 
-    private void HideTitlePanel()
+    private void HideTitleHUD()
     {
         _titleCanvas.SetActive(false);
     }
@@ -78,14 +105,28 @@ public class UIPanel : StateBase
 
     #region Gameplay Panel
 
-    private void ShowGameplayPanel()
+    private void ShowGameplayHUD()
     {
-         _gameplayCanvas.SetActive(true);
+        _gameplayCanvas.SetActive(true);
     }
 
-    private void HideGameplayPanel()
+    private void HideGameplayHUD()
     {
         _gameplayCanvas.SetActive(false);
+    }
+
+    #endregion
+
+    #region Gameover Panel
+
+    private void ShowGameoverHUD()
+    {
+        _gameoverCanvas.SetActive(true);
+    }
+
+    private void HideGameoverHUD()
+    {
+        _gameoverCanvas.SetActive(false);
     }
 
     #endregion

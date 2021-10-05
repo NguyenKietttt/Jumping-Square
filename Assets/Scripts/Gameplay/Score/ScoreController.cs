@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ScoreController : MonoBehaviour
+public class ScoreController : StateBase
 {
     public static event Action<int> displayScoreEvent;
 
@@ -10,20 +10,25 @@ public class ScoreController : MonoBehaviour
     private bool _isStartJump;
 
 
-    private void Awake() 
-    {
-        _totalScore = 0;
-        _isStartJump = true;
-    }
-
     private void OnEnable()
     {
+        StateController.OnTitleEvent += OnTitleMenu;
+
         SquareCollision.OnBorderCollideEvent += param => UpdateScore();
     }
 
     private void OnDisable()
     {
+        StateController.OnTitleEvent -= OnTitleMenu;
+
         SquareCollision.OnBorderCollideEvent -= param => UpdateScore();
+    }
+
+
+    public override void OnTitleMenu()
+    {
+        _totalScore = 0;
+        _isStartJump = true;
     }
 
 

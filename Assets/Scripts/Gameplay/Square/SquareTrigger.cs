@@ -6,7 +6,7 @@ public class SquareTrigger : MonoBehaviour
     {
         if (other.CompareTag("OpenSpike"))
         {
-            Time.timeScale = 0;
+            StateController.RaiseOnGameplayToGameoverEvent();
         }
     }
 }

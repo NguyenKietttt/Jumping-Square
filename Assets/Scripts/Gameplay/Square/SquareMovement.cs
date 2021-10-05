@@ -41,11 +41,13 @@ public class SquareMovement : StateBase
         StateController.OnTitleEvent += OnTitleMenu;
         StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
         StateController.OnGameplayEvent += OnGameplay;
+        StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
+
+        HolderController.endTitleToGameplayEvent += SetAllowJump;
 
         SquareCollision.OnBorderCollideEvent += param =>
         {
-            CheckIsCollided(param);
-            Jump();
+            Jump(param);
         };
     }
 
@@ -54,11 +56,13 @@ public class SquareMovement : StateBase
         StateController.OnTitleEvent -= OnTitleMenu;
         StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
         StateController.OnGameplayEvent -= OnGameplay;
+        StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
+
+        HolderController.endTitleToGameplayEvent -= SetAllowJump;
 
         SquareCollision.OnBorderCollideEvent -= param =>
         {
-            CheckIsCollided(param);
-            Jump();
+            Jump(param);
         };
     }
 
@@ -74,14 +78,27 @@ public class SquareMovement : StateBase
     public override void OnTitleToGameplay()
     {
         _spriteRenderer.enabled = true;
+
+        _isFirstJump = true;
     }
 
     public override void OnGameplay()
     {
-        _isAllowJump = true;
-        _isFirstJump = true;
-
         _squareRb.bodyType = RigidbodyType2D.Dynamic;
+        
+        Jump(_isCollided);
+    }
+
+    public override void OnGameplayToGameover()
+    {
+        _squareRb.velocity = Vector2.zero;
+        
+        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        _spriteRenderer.enabled = false;
+        _squareRb.bodyType = RigidbodyType2D.Kinematic;
+        
+        StateController.RaiseGameoverEvent();
     }
 
 
@@ -95,6 +112,14 @@ public class SquareMovement : StateBase
 
         if (!_isAllowJump)
             return;
+
+        if (_isFirstJump)
+        {
+            StateController.RaiseGameplayEvent();
+
+            _isFirstJump = false;
+            return;
+        }
 
         if (ctx.started)
         {
@@ -117,22 +142,15 @@ public class SquareMovement : StateBase
         }
     }
 
-    private void Jump()
+    private void Jump(bool isCollided)
     {
         if (_isFailedConfig)
             return;
 
-        if (!_isAllowJump)
-            return;
-
-        if (_isFirstJump)
-        {
-            _isFirstJump = false;
-            return;
-        }
+        _isCollided = isCollided;
 
         // Jump to an exact height
-        var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
+        var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2.0f
             * (Physics2D.gravity.y * _squareRb.gravityScale));
 
         _squareRb.velocity = Vector2.zero;
@@ -149,9 +167,9 @@ public class SquareMovement : StateBase
         }
     }
 
-    private void CheckIsCollided(bool isCollided)
+    private void SetAllowJump()
     {
-        _isCollided = isCollided;
+        _isAllowJump = true;
     }
 
     private void Rotate360(Vector3 rotateVector)
