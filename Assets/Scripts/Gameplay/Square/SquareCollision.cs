@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
-public class SquareCollision : MonoBehaviour
+public class SquareCollision : StateBase
 {
     public static event Action<bool> OnBorderCollideEvent;
 
@@ -12,22 +12,36 @@ public class SquareCollision : MonoBehaviour
     private bool _isCollided;
 
 
-    private void Start() 
+    private void OnEnable()
+    {
+        StateController.OnTitleEvent += OnTitleMenu;
+        StateController.OnGameplayEvent += OnGameplay;
+    }
+
+    private void OnDisable() 
+    {
+        StateController.OnTitleEvent -= OnTitleMenu;
+        StateController.OnGameplayEvent -= OnGameplay;
+    }
+
+
+    public override void OnGameplay()
     {
         _isCollided = RandomCollided();
-        
+
         OnBorderCollideEvent?.Invoke(_isCollided);
     }
 
-    private void OnCollisionEnter2D(Collision2D other) 
+
+    private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Border"))
         {
-           _isCollided = !_isCollided;
+            _isCollided = !_isCollided;
 
-           OnBorderCollideEvent?.Invoke(_isCollided);
+            OnBorderCollideEvent?.Invoke(_isCollided);
 
-           StartCoroutine(CheckDoubleJump());
+            StartCoroutine(CheckDoubleJump());
         }
     }
 

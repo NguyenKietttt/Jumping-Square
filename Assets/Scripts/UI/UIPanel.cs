@@ -40,13 +40,13 @@ public class UIPanel : StateBase
     private void OnEnable() 
     {
         StateController.OnTitleEvent += OnTitleMenu;
-        StateController.OnGameplayEvent += OnGameplay;
+        StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
     }
 
     private void OnDisable() 
     {
         StateController.OnTitleEvent -= OnTitleMenu;
-        StateController.OnGameplayEvent -= OnGameplay;
+        StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
     }
 
 
@@ -56,10 +56,9 @@ public class UIPanel : StateBase
         ShowTitlePanel();
     }
 
-    public override void OnGameplay()
+    public override void OnTitleToGameplay()
     {
         HideTitlePanel();
-        ShowGameplayPanel();
     }
 
 

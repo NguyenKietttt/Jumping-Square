@@ -39,6 +39,7 @@ public class SquareMovement : StateBase
     private void OnEnable()
     {
         StateController.OnTitleEvent += OnTitleMenu;
+        StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
         StateController.OnGameplayEvent += OnGameplay;
 
         SquareCollision.OnBorderCollideEvent += param =>
@@ -51,6 +52,7 @@ public class SquareMovement : StateBase
     private void OnDisable()
     {
         StateController.OnTitleEvent -= OnTitleMenu;
+        StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
         StateController.OnGameplayEvent -= OnGameplay;
 
         SquareCollision.OnBorderCollideEvent -= param =>
@@ -69,12 +71,16 @@ public class SquareMovement : StateBase
         _squareRb.bodyType = RigidbodyType2D.Kinematic;
     }
 
+    public override void OnTitleToGameplay()
+    {
+        _spriteRenderer.enabled = true;
+    }
+
     public override void OnGameplay()
     {
         _isAllowJump = true;
         _isFirstJump = true;
 
-        _spriteRenderer.enabled = true;
         _squareRb.bodyType = RigidbodyType2D.Dynamic;
     }
 
