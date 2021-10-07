@@ -4,7 +4,7 @@ using DG.Tweening;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class SquareMovement : MonoBehaviour
+public class SquareMovement : StateBase
 {
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
 
@@ -15,8 +15,9 @@ public class SquareMovement : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private bool _isCollided, _isStartJump;
+    private bool _isAllowJump, _isFirstJump, _isCollided;
     private Rigidbody2D _squareRb;
+    private SpriteRenderer _spriteRenderer;
     private Transform _cacheTransform;
 
 
@@ -33,36 +34,92 @@ public class SquareMovement : MonoBehaviour
 
         if (_isFailedConfig)
             enabled = false;
-
-        _isStartJump = true;
     }
 
     private void OnEnable()
     {
+        StateController.OnTitleEvent += OnTitleMenu;
+        StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
+        StateController.OnGameplayEvent += OnGameplay;
+        StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
+
+        HolderController.endTitleToGameplayEvent += SetAllowJump;
+
         SquareCollision.OnBorderCollideEvent += param =>
         {
-            CheckIsCollided(param);
-            Jump();
+            Jump(param);
         };
     }
 
     private void OnDisable()
     {
+        StateController.OnTitleEvent -= OnTitleMenu;
+        StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
+        StateController.OnGameplayEvent -= OnGameplay;
+        StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
+
+        HolderController.endTitleToGameplayEvent -= SetAllowJump;
+
         SquareCollision.OnBorderCollideEvent -= param =>
         {
-            CheckIsCollided(param);
-            Jump();
+            Jump(param);
         };
     }
 
 
+    public override void OnTitleMenu()
+    {
+        _isAllowJump = false;
+
+        _spriteRenderer.enabled = false;
+        _squareRb.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    public override void OnTitleToGameplay()
+    {
+        _spriteRenderer.enabled = true;
+
+        _isFirstJump = true;
+    }
+
+    public override void OnGameplay()
+    {
+        _squareRb.bodyType = RigidbodyType2D.Dynamic;
+        
+        Jump(_isCollided);
+    }
+
+    public override void OnGameplayToGameover()
+    {
+        _squareRb.velocity = Vector2.zero;
+        
+        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        _spriteRenderer.enabled = false;
+        _squareRb.bodyType = RigidbodyType2D.Kinematic;
+        
+        StateController.RaiseGameoverEvent();
+    }
+
+
     /// <summary>
-    /// Raise by InputManager in Herachy
+    /// Raise by InputManager in Hierarchy
     /// </summary>
     public void Jump(InputAction.CallbackContext ctx)
     {
         if (_isFailedConfig)
             return;
+
+        if (!_isAllowJump)
+            return;
+
+        if (_isFirstJump)
+        {
+            StateController.RaiseGameplayEvent();
+
+            _isFirstJump = false;
+            return;
+        }
 
         if (ctx.started)
         {
@@ -85,19 +142,15 @@ public class SquareMovement : MonoBehaviour
         }
     }
 
-    private void Jump()
+    private void Jump(bool isCollided)
     {
         if (_isFailedConfig)
             return;
 
-        if (_isStartJump)
-        {
-            _isStartJump = false;
-            return;
-        }
+        _isCollided = isCollided;
 
         // Jump to an exact height
-        var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
+        var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2.0f
             * (Physics2D.gravity.y * _squareRb.gravityScale));
 
         _squareRb.velocity = Vector2.zero;
@@ -114,9 +167,9 @@ public class SquareMovement : MonoBehaviour
         }
     }
 
-    private void CheckIsCollided(bool isCollided)
+    private void SetAllowJump()
     {
-        _isCollided = isCollided;
+        _isAllowJump = true;
     }
 
     private void Rotate360(Vector3 rotateVector)
@@ -128,7 +181,7 @@ public class SquareMovement : MonoBehaviour
     private void CacheComponents()
     {
         _cacheTransform = transform;
-
         _squareRb = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 }

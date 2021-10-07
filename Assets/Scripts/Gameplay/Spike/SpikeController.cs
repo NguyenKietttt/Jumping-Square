@@ -1,11 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Collections;
+using System;
 
-public class SpikeController : MonoBehaviour
+public class SpikeController : StateBase
 {
     private readonly float OLD_POSITION = -4.5f;
     private readonly float NEW_POSITION = -3.5f;
+
+
+    public static event Action endGameplayToGameoverEvent;
 
 
     [Header("Configs")]
@@ -45,14 +50,27 @@ public class SpikeController : MonoBehaviour
 
     private void OnEnable()
     {
+        StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
+
         SquareCollision.OnBorderCollideEvent += param => MoveSelectedSpike(param);
         ScoreController.displayScoreEvent += param => SetSpikeSpawnedByScore(param);
     }
 
     private void OnDisable()
     {
+        StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
+
         SquareCollision.OnBorderCollideEvent -= param => MoveSelectedSpike(param);
         ScoreController.displayScoreEvent -= param => SetSpikeSpawnedByScore(param);
+    }
+
+
+    public override void OnGameplayToGameover()
+    {
+        ReturnSpike(_leftSpikes);
+        ReturnSpike(_rightSpikes);
+
+        StartCoroutine(DelayBeforeGameover());
     }
 
 
@@ -102,7 +120,7 @@ public class SpikeController : MonoBehaviour
         {
             do
             {
-                spikeIndex = Random.Range(0, spikes.Count);
+                spikeIndex = UnityEngine.Random.Range(0, spikes.Count);
             }
             while (spikes[spikeIndex].tag == "OpenSpike");
 
@@ -121,5 +139,12 @@ public class SpikeController : MonoBehaviour
                 spike.DOLocalMoveY(OLD_POSITION, _spikeSO.SpawnDeday);
             }
         }
+    }
+
+    private IEnumerator DelayBeforeGameover()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        endGameplayToGameoverEvent?.Invoke();
     }
 }
