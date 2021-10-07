@@ -91,13 +91,13 @@ public class SquareMovement : StateBase
 
     public override void OnGameplayToGameover()
     {
-        _squareRb.velocity = Vector2.zero;
-        
-        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        _isAllowJump = false;
 
+        _squareRb.velocity = Vector2.zero;
         _spriteRenderer.enabled = false;
         _squareRb.bodyType = RigidbodyType2D.Kinematic;
         
+        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         StateController.RaiseGameoverEvent();
     }
 
