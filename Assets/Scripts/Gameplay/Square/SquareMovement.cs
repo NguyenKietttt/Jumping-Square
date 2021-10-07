@@ -169,15 +169,17 @@ public class SquareMovement : StateBase
 
     private void HideSquare()
     {
+        DOTween.Kill(_cacheTransform);
+
         _isAllowJump = false;
 
-        _squareRb.velocity = Vector2.zero;
         _spriteRenderer.enabled = false;
+        _squareRb.velocity = Vector2.zero;
         _squareRb.bodyType = RigidbodyType2D.Kinematic;
 
         _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        
         _cacheTransform.localScale = Vector3.zero;
+
     }
 
     private void Rotate360(Vector3 rotateVector)
