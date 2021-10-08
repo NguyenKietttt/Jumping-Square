@@ -3,7 +3,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
-public class UIScore : MonoBehaviour
+public class UIScore : StateBase
 {
     private readonly Vector3 vector90 = new Vector3(0, 90.0f, 0);
 
@@ -39,20 +39,24 @@ public class UIScore : MonoBehaviour
 
     private void OnEnable()
     {
+        StateController.OnTitleEvent += OnTitleMenu;
+
         ScoreController.displayScoreEvent += param => StartCoroutine(DisplayScore(param));
     }
 
     private void OnDisable()
     {
+        StateController.OnTitleEvent -= OnTitleMenu;
+
         ScoreController.displayScoreEvent -= param => StartCoroutine(DisplayScore(param));
     }
 
-
-    private void CacheComponents()
+    
+    public override void OnTitleMenu()
     {
-        _scoreText = _score.GetComponent<TextMeshProUGUI>();
-        _scoreTextRect = _score.GetComponent<RectTransform>();
+        _scoreText.text = "0";
     }
+
 
     private IEnumerator DisplayScore(int score)
     {
@@ -73,5 +77,11 @@ public class UIScore : MonoBehaviour
             _scoreText.DOColor(_scoreSO.MilestoneScore, 1.0f);
         else
             _scoreText.DOColor(_scoreSO.NormalScore, 1.0f);
+    }
+
+    private void CacheComponents()
+    {
+        _scoreText = _score.GetComponent<TextMeshProUGUI>();
+        _scoreTextRect = _score.GetComponent<RectTransform>();
     }
 }

@@ -30,10 +30,11 @@ public class SquareMovement : StateBase
 
     private void Awake()
     {
-        CacheComponents();
 
         if (_isFailedConfig)
             enabled = false;
+
+        CacheComponents();
     }
 
     private void OnEnable()
@@ -43,12 +44,9 @@ public class SquareMovement : StateBase
         StateController.OnGameplayEvent += OnGameplay;
         StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
 
-        HolderController.endTitleToGameplayEvent += SetAllowJump;
+        HolderController.endTitleToGameplayEvent += ShowSquare;
 
-        SquareCollision.OnBorderCollideEvent += param =>
-        {
-            Jump(param);
-        };
+        SquareCollision.OnBorderCollideEvent += param => Jump(param);
     }
 
     private void OnDisable()
@@ -58,12 +56,9 @@ public class SquareMovement : StateBase
         StateController.OnGameplayEvent -= OnGameplay;
         StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
 
-        HolderController.endTitleToGameplayEvent -= SetAllowJump;
+        HolderController.endTitleToGameplayEvent -= ShowSquare;
 
-        SquareCollision.OnBorderCollideEvent -= param =>
-        {
-            Jump(param);
-        };
+        SquareCollision.OnBorderCollideEvent -= param => Jump(param);
     }
 
 
@@ -85,20 +80,13 @@ public class SquareMovement : StateBase
     public override void OnGameplay()
     {
         _squareRb.bodyType = RigidbodyType2D.Dynamic;
-        
+
         Jump(_isCollided);
     }
 
     public override void OnGameplayToGameover()
     {
-        _isAllowJump = false;
-
-        _squareRb.velocity = Vector2.zero;
-        _spriteRenderer.enabled = false;
-        _squareRb.bodyType = RigidbodyType2D.Kinematic;
-        
-        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        StateController.RaiseGameoverEvent();
+        HideSquare();
     }
 
 
@@ -167,9 +155,31 @@ public class SquareMovement : StateBase
         }
     }
 
-    private void SetAllowJump()
+    private void ShowSquare()
     {
-        _isAllowJump = true;
+        Sequence showSeq = DOTween.Sequence()
+            .OnStart(() =>
+                {
+                    _cacheTransform.DOScale(new Vector2(0.8f, 0.8f), 1.0f).SetEase(Ease.OutBack);
+                    Rotate360(ROTATE_VECTOR);
+                })
+            .AppendInterval(1.2f)
+            .OnComplete(() => _isAllowJump = true);
+    }
+
+    private void HideSquare()
+    {
+        DOTween.Kill(_cacheTransform);
+
+        _isAllowJump = false;
+
+        _spriteRenderer.enabled = false;
+        _squareRb.velocity = Vector2.zero;
+        _squareRb.bodyType = RigidbodyType2D.Kinematic;
+
+        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        _cacheTransform.localScale = Vector3.zero;
+
     }
 
     private void Rotate360(Vector3 rotateVector)

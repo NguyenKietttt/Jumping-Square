@@ -67,10 +67,10 @@ public class SpikeController : StateBase
 
     public override void OnGameplayToGameover()
     {
-        ReturnSpike(_leftSpikes);
-        ReturnSpike(_rightSpikes);
-
-        StartCoroutine(DelayBeforeGameover());
+        Sequence gameplayToGameoverSeq = DOTween.Sequence()
+            .AppendCallback(() => ReturnSpike(_leftSpikes))
+            .AppendCallback(() => ReturnSpike(_rightSpikes))
+            .OnComplete(() => endGameplayToGameoverEvent?.Invoke());
     }
 
 
@@ -133,18 +133,11 @@ public class SpikeController : StateBase
     {
         foreach (var spike in spikes)
         {
-            if (spike.localPosition.y == NEW_POSITION)
+            if (spike.localPosition.y != OLD_POSITION)
             {
                 spike.tag = "Spike";
                 spike.DOLocalMoveY(OLD_POSITION, _spikeSO.SpawnDeday);
             }
         }
-    }
-
-    private IEnumerator DelayBeforeGameover()
-    {
-        yield return new WaitForSeconds(0.5f);
-
-        endGameplayToGameoverEvent?.Invoke();
     }
 }

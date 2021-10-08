@@ -1,4 +1,6 @@
 using UnityEngine;
+using DG.Tweening;
+using UnityEngine.UI;
 
 public class UIPanel : StateBase
 {
@@ -10,12 +12,16 @@ public class UIPanel : StateBase
     [SerializeField] private GameObject _gameplayCanvas;
     [SerializeField] private RectTransform _gameplayPanel;
 
-    [Header("Gameplay HUD")]
+    [Header("Gameover HUD")]
     [SerializeField] private GameObject _gameoverCanvas;
     [SerializeField] private RectTransform _gameoverPanel;
 
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
+
+    private GraphicRaycaster _raycasterTitle, _raycasterGameover;
+
+    private bool _isFirstPlay;
 
 
     private void OnValidate()
@@ -37,6 +43,10 @@ public class UIPanel : StateBase
     {
         if (_isFailedConfig)
             enabled = false;
+
+        CacheComponents();
+
+        _isFirstPlay = true;
     }
 
     private void Start()
@@ -48,8 +58,9 @@ public class UIPanel : StateBase
     {
         StateController.OnTitleEvent += OnTitleMenu;
         StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
+
         StateController.OnGameplayEvent += OnGameplay;
-        
+
         StateController.OnGameoverEvent += OnGameOver;
     }
 
@@ -57,6 +68,7 @@ public class UIPanel : StateBase
     {
         StateController.OnTitleEvent -= OnTitleMenu;
         StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
+
         StateController.OnGameplayEvent -= OnGameplay;
 
         StateController.OnGameoverEvent -= OnGameOver;
@@ -65,15 +77,19 @@ public class UIPanel : StateBase
 
     public override void OnTitleMenu()
     {
-        HideGameplayHUD();
-        HideGameoverHUD();
+        if (!_isFirstPlay)
+        {
+            Sequence titleSeq = DOTween.Sequence()
+                .AppendCallback(() => HideGameoverHUD())
+                .AppendInterval(1.2f)
+                .OnComplete(() => ShowTitleHUD());
+        }
+        else
+        {
+            _isFirstPlay = false;
 
-        ShowTitleHUD();
-    }
-
-    public override void OnTitleToGameplay()
-    {
-        HideTitleHUD();
+            ShowTitleHUD();
+        }
     }
 
     public override void OnGameplay()
@@ -83,9 +99,10 @@ public class UIPanel : StateBase
 
     public override void OnGameOver()
     {
-        HideGameplayHUD();
-
-        ShowGameoverHUD();
+        Sequence gameoverSeq = DOTween.Sequence()
+            .AppendCallback(() => HideGameplayHUD())
+            .AppendInterval(1.2f)
+            .OnComplete(() => ShowGameoverHUD());
     }
 
 
@@ -93,12 +110,23 @@ public class UIPanel : StateBase
 
     private void ShowTitleHUD()
     {
-        _titleCanvas.SetActive(true);
+        Sequence showSeq = DOTween.Sequence()
+            .OnStart(() =>
+            {
+                _titleCanvas.SetActive(true);
+                _titlePanel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);
+            })
+            .AppendInterval(1.2f)
+            .OnComplete(() => _raycasterTitle.enabled = true);
     }
 
-    private void HideTitleHUD()
+    public void HideTitleHUD()
     {
-        _titleCanvas.SetActive(false);
+        Sequence hideSeq = DOTween.Sequence()
+            .OnStart(() => _raycasterTitle.enabled = false)
+            .Append(_titlePanel.DOScale(Vector3.zero, 0.8f).SetEase(Ease.InBack))
+            .AppendCallback(() => _titleCanvas.SetActive(false))
+            .OnComplete(() => StateController.RaiseTitleToGameplayEvent());
     }
 
     #endregion
@@ -107,12 +135,16 @@ public class UIPanel : StateBase
 
     private void ShowGameplayHUD()
     {
-        _gameplayCanvas.SetActive(true);
+        Sequence showSeq = DOTween.Sequence()
+            .OnStart(() => _gameplayCanvas.SetActive(true))
+            .Append(_gameplayPanel.DOAnchorPos(Vector2.zero, 0.8f).SetEase(Ease.OutBack));
     }
 
     private void HideGameplayHUD()
     {
-        _gameplayCanvas.SetActive(false);
+        Sequence hideSeq = DOTween.Sequence()
+            .Append(_gameplayPanel.DOAnchorPos(new Vector2(0.0f, 1000.0f), 0.8f).SetEase(Ease.InBack))
+            .OnComplete(() => _gameplayCanvas.SetActive(false));
     }
 
     #endregion
@@ -121,13 +153,29 @@ public class UIPanel : StateBase
 
     private void ShowGameoverHUD()
     {
-        _gameoverCanvas.SetActive(true);
+        Sequence showSeq = DOTween.Sequence()
+            .OnStart(() =>
+            {
+                _gameoverCanvas.SetActive(true);
+                _gameoverPanel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);
+            })
+            .AppendInterval(1.2f)
+            .OnComplete(() => _raycasterGameover.enabled = true);
     }
 
     private void HideGameoverHUD()
     {
-        _gameoverCanvas.SetActive(false);
+        Sequence hideSeq = DOTween.Sequence()
+            .OnStart(() => _raycasterGameover.enabled = false)
+            .Append(_gameoverPanel.DOScale(Vector3.zero, 0.8f).SetEase(Ease.InBack))
+            .OnComplete(() => _gameoverCanvas.SetActive(false));
     }
 
     #endregion
+
+    private void CacheComponents()
+    {
+        _raycasterTitle = _titleCanvas.GetComponent<GraphicRaycaster>();
+        _raycasterGameover = _gameoverCanvas.GetComponent<GraphicRaycaster>();
+    }
 }
