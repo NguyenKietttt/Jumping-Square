@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using System.Collections;
 using System;
 
 public class SpikeController : StateBase
 {
-    private readonly float OLD_POSITION = -4.5f;
-    private readonly float NEW_POSITION = -3.5f;
+    private readonly float OLD_SPIKE_POSITION = -4.5f;
+    private readonly float NEW_SPIKE_POSITION = -3.5f;
 
 
     public static event Action endGameplayToGameoverEvent;
@@ -125,7 +124,7 @@ public class SpikeController : StateBase
             while (spikes[spikeIndex].tag == "OpenSpike");
 
             spikes[spikeIndex].tag = "OpenSpike";
-            spikes[spikeIndex].DOLocalMoveY(NEW_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.InBack);
+            spikes[spikeIndex].DOLocalMoveY(NEW_SPIKE_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.InBack);
         }
     }
 
@@ -133,10 +132,10 @@ public class SpikeController : StateBase
     {
         foreach (var spike in spikes)
         {
-            if (spike.localPosition.y != OLD_POSITION)
+            if (spike.localPosition.y != OLD_SPIKE_POSITION)
             {
                 spike.tag = "Spike";
-                spike.DOLocalMoveY(OLD_POSITION, _spikeSO.SpawnDeday);
+                spike.DOLocalMoveY(OLD_SPIKE_POSITION, _spikeSO.SpawnDeday);
             }
         }
     }

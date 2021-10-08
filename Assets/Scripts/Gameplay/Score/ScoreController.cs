@@ -32,7 +32,7 @@ public class ScoreController : StateBase
     }
 
 
-    public void UpdateScore()
+    private void UpdateScore()
     {
         if (_isStartJump)
         {

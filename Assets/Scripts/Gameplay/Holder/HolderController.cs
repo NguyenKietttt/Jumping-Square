@@ -59,14 +59,12 @@ public class HolderController : StateBase
     private void OnEnable()
     {
         StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
-
         SpikeController.endGameplayToGameoverEvent += HideHolder;
     }
 
     private void OnDisable()
     {
         StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
-
         SpikeController.endGameplayToGameoverEvent -= HideHolder;
     }
 

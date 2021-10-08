@@ -15,3 +15,7 @@ MonoBehaviour:
   jumpHeight: 1.1
   jumpLength: 3.5
   rotateDuration: 0.8
+  collidedVFX: {fileID: 194062, guid: 8c27aeead6d968e4ba986702d6b84335, type: 3}
+  collidedVFXDuration: 1.5
+  jumpVFX: {fileID: 100000, guid: 83cd9cc9f9c88824ba18dc59b05ae328, type: 3}
+  jumpVFXDuration: 1.5

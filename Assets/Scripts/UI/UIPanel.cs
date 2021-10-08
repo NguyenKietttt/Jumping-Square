@@ -120,6 +120,9 @@ public class UIPanel : StateBase
             .OnComplete(() => _raycasterTitle.enabled = true);
     }
 
+    /// <summary>
+    /// Raise by PlayButton in Hierarchy
+    /// </summary>
     public void HideTitleHUD()
     {
         Sequence hideSeq = DOTween.Sequence()

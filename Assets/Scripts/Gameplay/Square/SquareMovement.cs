@@ -7,6 +7,7 @@ using DG.Tweening;
 public class SquareMovement : StateBase
 {
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
+    private readonly Vector3 VFX_JUMP_OFFSET = new Vector3(0.0f, -0.5f, 0);
 
 
     [Header("Configs")]
@@ -117,6 +118,8 @@ public class SquareMovement : StateBase
 
             _squareRb.velocity = Vector2.zero;
 
+            SpawnJumpVFX();
+
             if (_isCollided)
             {
                 _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
@@ -186,6 +189,11 @@ public class SquareMovement : StateBase
     {
         _cacheTransform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.WorldAxisAdd)
             .SetEase(Ease.OutSine);
+    }
+
+    private void SpawnJumpVFX()
+    {
+        Instantiate(_squareSO.JumpVFX, _cacheTransform.position + VFX_JUMP_OFFSET, Quaternion.identity);
     }
 
     private void CacheComponents()
