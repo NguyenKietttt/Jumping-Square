@@ -79,7 +79,7 @@ public class UIPanel : StateBase
     {
         if (!_isFirstPlay)
         {
-            Sequence titleSeq = DOTween.Sequence()
+            DOTween.Sequence()
                 .AppendCallback(() => HideGameoverHUD())
                 .AppendInterval(1.2f)
                 .OnComplete(() => ShowTitleHUD());
@@ -99,7 +99,7 @@ public class UIPanel : StateBase
 
     public override void OnGameOver()
     {
-        Sequence gameoverSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .AppendCallback(() => HideGameplayHUD())
             .AppendInterval(1.2f)
             .OnComplete(() => ShowGameoverHUD());
@@ -110,7 +110,7 @@ public class UIPanel : StateBase
 
     private void ShowTitleHUD()
     {
-        Sequence showSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .OnStart(() =>
             {
                 _titleCanvas.SetActive(true);
@@ -125,7 +125,7 @@ public class UIPanel : StateBase
     /// </summary>
     public void HideTitleHUD()
     {
-        Sequence hideSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .OnStart(() => _raycasterTitle.enabled = false)
             .Append(_titlePanel.DOScale(Vector3.zero, 0.8f).SetEase(Ease.InBack))
             .AppendCallback(() => _titleCanvas.SetActive(false))
@@ -138,14 +138,14 @@ public class UIPanel : StateBase
 
     private void ShowGameplayHUD()
     {
-        Sequence showSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .OnStart(() => _gameplayCanvas.SetActive(true))
             .Append(_gameplayPanel.DOAnchorPos(Vector2.zero, 0.8f).SetEase(Ease.OutBack));
     }
 
     private void HideGameplayHUD()
     {
-        Sequence hideSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .Append(_gameplayPanel.DOAnchorPos(new Vector2(0.0f, 1000.0f), 0.8f).SetEase(Ease.InBack))
             .OnComplete(() => _gameplayCanvas.SetActive(false));
     }
@@ -156,7 +156,7 @@ public class UIPanel : StateBase
 
     private void ShowGameoverHUD()
     {
-        Sequence showSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .OnStart(() =>
             {
                 _gameoverCanvas.SetActive(true);
@@ -168,7 +168,7 @@ public class UIPanel : StateBase
 
     private void HideGameoverHUD()
     {
-        Sequence hideSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .OnStart(() => _raycasterGameover.enabled = false)
             .Append(_gameoverPanel.DOScale(Vector3.zero, 0.8f).SetEase(Ease.InBack))
             .OnComplete(() => _gameoverCanvas.SetActive(false));

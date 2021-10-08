@@ -7,7 +7,8 @@ using DG.Tweening;
 public class SquareMovement : StateBase
 {
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
-    private readonly Vector3 VFX_JUMP_OFFSET = new Vector3(0.0f, -0.5f, 0);
+    private readonly Vector3 VFX_JUMP_LEFT_OFFSET = new Vector3(0.3f, -0.5f, 0);
+    private readonly Vector3 VFX_JUMP_RIGHT_OFFSET = new Vector3(-0.3f, -0.5f, 0);
 
 
     [Header("Configs")]
@@ -18,8 +19,7 @@ public class SquareMovement : StateBase
 
     private bool _isAllowJump, _isFirstJump, _isCollided;
     private Rigidbody2D _squareRb;
-    private SpriteRenderer _spriteRenderer;
-    private Transform _cacheTransform;
+    private Transform _transform;
 
 
     private void OnValidate()
@@ -67,14 +67,11 @@ public class SquareMovement : StateBase
     {
         _isAllowJump = false;
 
-        _spriteRenderer.enabled = false;
         _squareRb.bodyType = RigidbodyType2D.Kinematic;
     }
 
     public override void OnTitleToGameplay()
     {
-        _spriteRenderer.enabled = true;
-
         _isFirstJump = true;
     }
 
@@ -118,15 +115,18 @@ public class SquareMovement : StateBase
 
             _squareRb.velocity = Vector2.zero;
 
-            SpawnJumpVFX();
 
             if (_isCollided)
             {
+                SpawnJumpVFX(VFX_JUMP_LEFT_OFFSET);
+                
                 _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
                 Rotate360(ROTATE_VECTOR);
             }
             else
             {
+                SpawnJumpVFX(VFX_JUMP_RIGHT_OFFSET);
+
                 _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
                 Rotate360(-ROTATE_VECTOR);
             }
@@ -160,10 +160,10 @@ public class SquareMovement : StateBase
 
     private void ShowSquare()
     {
-        Sequence showSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .OnStart(() =>
                 {
-                    _cacheTransform.DOScale(new Vector2(0.8f, 0.8f), 1.0f).SetEase(Ease.OutBack);
+                    _transform.DOScale(new Vector2(0.8f, 0.8f), 1.0f).SetEase(Ease.OutBack);
                     Rotate360(ROTATE_VECTOR);
                 })
             .AppendInterval(1.2f)
@@ -172,34 +172,32 @@ public class SquareMovement : StateBase
 
     private void HideSquare()
     {
-        DOTween.Kill(_cacheTransform);
+        DOTween.Kill(_transform);
 
         _isAllowJump = false;
 
-        _spriteRenderer.enabled = false;
         _squareRb.velocity = Vector2.zero;
         _squareRb.bodyType = RigidbodyType2D.Kinematic;
 
-        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        _cacheTransform.localScale = Vector3.zero;
+        _transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        _transform.localScale = Vector3.zero;
 
     }
 
     private void Rotate360(Vector3 rotateVector)
     {
-        _cacheTransform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.WorldAxisAdd)
+        _transform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.WorldAxisAdd)
             .SetEase(Ease.OutSine);
     }
 
-    private void SpawnJumpVFX()
+    private void SpawnJumpVFX(Vector3 offset)
     {
-        Instantiate(_squareSO.JumpVFX, _cacheTransform.position + VFX_JUMP_OFFSET, Quaternion.identity);
+        Instantiate(_squareSO.JumpVFX, _transform.position + offset, Quaternion.identity);
     }
 
     private void CacheComponents()
     {
-        _cacheTransform = transform;
+        _transform = transform;
         _squareRb = GetComponent<Rigidbody2D>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 }

@@ -43,12 +43,11 @@ public class SpikeController : StateBase
 
         _leftSpikes = GetHolderChilds(_leftSpikeHolder);
         _rightSpikes = GetHolderChilds(_rightSpikeHolder);
-
-        _spikesPerLevel = 1;
     }
 
     private void OnEnable()
     {
+        StateController.OnTitleEvent += OnTitleMenu;
         StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
 
         SquareCollision.OnBorderCollideEvent += param => MoveSelectedSpike(param);
@@ -57,6 +56,7 @@ public class SpikeController : StateBase
 
     private void OnDisable()
     {
+        StateController.OnTitleEvent -= OnTitleMenu;
         StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
 
         SquareCollision.OnBorderCollideEvent -= param => MoveSelectedSpike(param);
@@ -64,11 +64,17 @@ public class SpikeController : StateBase
     }
 
 
+    public override void OnTitleMenu()
+    {
+        _spikesPerLevel = 1;
+    }
+
     public override void OnGameplayToGameover()
     {
-        Sequence gameplayToGameoverSeq = DOTween.Sequence()
+        DOTween.Sequence()
             .AppendCallback(() => ReturnSpike(_leftSpikes))
             .AppendCallback(() => ReturnSpike(_rightSpikes))
+            .AppendInterval(1.3f)
             .OnComplete(() => endGameplayToGameoverEvent?.Invoke());
     }
 
@@ -87,14 +93,12 @@ public class SpikeController : StateBase
 
     private void SetSpikeSpawnedByScore(int score)
     {
-        if (score >= 5)
+        if (score >= 5 && score < 10)
             _spikesPerLevel = 2;
-        else if (score >= 10)
+        else if (score >= 10 && score < 15)
             _spikesPerLevel = 3;
-        else if (score >= 15)
+        else if (score >= 15 && score < 100)
             _spikesPerLevel = 4;
-        else
-            _spikesPerLevel = 1;
     }
 
     private void MoveSelectedSpike(bool isCollided)
@@ -124,7 +128,7 @@ public class SpikeController : StateBase
             while (spikes[spikeIndex].tag == "OpenSpike");
 
             spikes[spikeIndex].tag = "OpenSpike";
-            spikes[spikeIndex].DOLocalMoveY(NEW_SPIKE_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.InBack);
+            spikes[spikeIndex].DOLocalMoveY(NEW_SPIKE_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.OutBack);
         }
     }
 

@@ -1,23 +1,36 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(ParticleSystem))]
 public class AutoDestroyVFX : MonoBehaviour
 {
-	private void OnEnable()
-	{
-		StartCoroutine(CheckIfAlive());
-	}
-	
-	private IEnumerator CheckIfAlive()
-	{
-		ParticleSystem ps = this.GetComponent<ParticleSystem>();
-		
-		while(true && ps != null)
-		{
-			yield return new WaitForSeconds(0.5f);
+    private ParticleSystem _vfx;
 
-			if (!ps.IsAlive(true))
-				GameObject.Destroy(this.gameObject);
-		}
-	}
+
+    private void Awake()
+    {
+        CacheComponents();
+    }
+
+    private void OnEnable()
+    {
+        StartCoroutine(CheckIfAlive());
+    }
+
+
+    private IEnumerator CheckIfAlive()
+    {
+        while (true && _vfx != null)
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            if (!_vfx.IsAlive(true))
+                Destroy(gameObject);
+        }
+    }
+
+    private void CacheComponents()
+    {
+        _vfx = GetComponent<ParticleSystem>();
+    }
 }

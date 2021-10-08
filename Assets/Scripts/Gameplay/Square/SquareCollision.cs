@@ -1,11 +1,12 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using DG.Tweening;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class SquareCollision : StateBase
 {
-    private readonly Quaternion INVERT_ROTATION = Quaternion.Euler(0, 0, 180.0f);
+    private readonly Quaternion INVERT_ROTATION = Quaternion.Euler(0, 0, -180.0f);
 
 
     public static event Action<bool> OnBorderCollideEvent;
@@ -17,6 +18,7 @@ public class SquareCollision : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
+    private Transform _transform;
     private BoxCollider2D _boxCollider2D;
     private Renderer _renderer;
     private bool _isCollided;
@@ -67,39 +69,35 @@ public class SquareCollision : StateBase
             OnBorderCollideEvent?.Invoke(_isCollided);
 
             SpawnCollidedVFX();
-            StartCoroutine(CheckDoubleJump());
+            CheckDoubleJump();
         }
     }
 
 
-    private IEnumerator CheckDoubleJump()
+    private void CheckDoubleJump()
     {
-        _boxCollider2D.enabled = false;
-
-        yield return new WaitForSeconds(0.2f);
-
-        _boxCollider2D.enabled = true;
+        DOTween.Sequence()
+            .AppendCallback(() => _boxCollider2D.enabled = false)
+            .AppendInterval(0.2f)
+            .OnComplete(() => _boxCollider2D.enabled = true);
     }
 
     private bool RandomJumpDirection()
     {
-        var result = (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
-
-        return result;
+        return (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
     }
 
     private void SpawnCollidedVFX()
     {
-        GameObject dustVFX;
-
         if (_isCollided)
-            dustVFX = Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, Quaternion.identity);
+            Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, Quaternion.identity);
         else
-            dustVFX = Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, INVERT_ROTATION);
+            Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, INVERT_ROTATION);
     }
 
     private void CacheComponents()
     {
+        _transform = GetComponent<Transform>();
         _boxCollider2D = GetComponent<BoxCollider2D>();
         _renderer = GetComponent<Renderer>();
     }

@@ -11,6 +11,7 @@ public class SquareSO : ScriptableObject
     [Header("VFX")]
     [SerializeField] private GameObject collidedVFX;
     [SerializeField] private GameObject jumpVFX;
+    [SerializeField] private GameObject explodeVFX;
     
 
     #region Properties
@@ -21,6 +22,7 @@ public class SquareSO : ScriptableObject
     
     public GameObject CollidedVFX => collidedVFX;
     public GameObject JumpVFX => jumpVFX;
+    public GameObject ExplodeVFX => explodeVFX;
 
     #endregion
 }
