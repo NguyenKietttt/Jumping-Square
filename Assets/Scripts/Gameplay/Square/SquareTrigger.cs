@@ -9,7 +9,7 @@ public class SquareTrigger : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private Camera _main;
+    private Camera _mainCamera;
 
 
     private void OnValidate()
@@ -24,7 +24,7 @@ public class SquareTrigger : MonoBehaviour
         if (_isFailedConfig)
             enabled = false;
 
-        _main = Camera.main;
+        _mainCamera = Camera.main;
     }
 
     private void OnTriggerEnter2D(Collider2D other) 
@@ -32,7 +32,7 @@ public class SquareTrigger : MonoBehaviour
         if (other.CompareTag("OpenSpike"))
         {
             Instantiate(_squareSO.ExplodeVFX, transform.position, Quaternion.identity);
-            _main.DOShakePosition(0.5f, 0.5f);
+            _mainCamera.DOShakePosition(0.5f, 0.5f);
 
             StateController.RaiseOnGameplayToGameoverEvent();
         }
