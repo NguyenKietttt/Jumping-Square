@@ -24,7 +24,6 @@ public class UIPanel : StateBase
     [SerializeField] private bool _isFailedConfig;
 
     private GraphicRaycaster _raycasterTitle, _raycasterGameover;
-
     private bool _isFirstPlay;
 
 
@@ -84,15 +83,24 @@ public class UIPanel : StateBase
         if (!_isFirstPlay)
         {
             DOTween.Sequence()
-                .AppendCallback(() => HideGameoverHUD())
+                .AppendCallback(() =>
+                {
+                    HideHUD(_gameoverCanvas, _gameoverPanel, _gameoverButtons, _raycasterGameover,
+                        () => { });
+                })
                 .AppendInterval(1.2f)
-                .OnComplete(() => ShowTitleHUD());
+                .OnComplete(() =>
+                {
+                    ShowHUD(_titleCanvas, _titlePanel, _titleButtons,
+                        () => _raycasterTitle.enabled = true);
+                });
         }
         else
         {
             _isFirstPlay = false;
 
-            ShowTitleHUD();
+            ShowHUD(_titleCanvas, _titlePanel, _titleButtons,
+                () => _raycasterTitle.enabled = true);
         }
     }
 
@@ -106,24 +114,29 @@ public class UIPanel : StateBase
         DOTween.Sequence()
             .AppendCallback(() => HideGameplayHUD())
             .AppendInterval(1.2f)
-            .OnComplete(() => ShowGameoverHUD());
+            .OnComplete(() =>
+            {
+                ShowHUD(_gameoverCanvas, _gameoverPanel, _gameoverButtons,
+                    () => _raycasterGameover.enabled = true);
+            });
     }
 
 
-    #region Title Panel
+    #region Title Panel & Gameover Panel
 
-    private void ShowTitleHUD()
+    private void ShowHUD(GameObject canvas, RectTransform panel,
+        List<Transform> buttons, TweenCallback method)
     {
         DOTween.Sequence()
             .OnStart(() =>
             {
-                _titleCanvas.SetActive(true);
-                _titlePanel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);
+                canvas.SetActive(true);
+                panel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);
             })
             .AppendInterval(1.2f)
-            .AppendCallback(() => StartCoroutine(ShowButtons(_titleButtons)))
+            .AppendCallback(() => StartCoroutine(ShowButtons(buttons)))
             .AppendInterval(0.5f)
-            .OnComplete(() => _raycasterTitle.enabled = true);
+            .OnComplete(() => method());
     }
 
     /// <summary>
@@ -131,13 +144,43 @@ public class UIPanel : StateBase
     /// </summary>
     public void HideTitleHUD()
     {
+        HideHUD(_titleCanvas, _titlePanel, _titleButtons, _raycasterTitle,
+            () => StateController.RaiseTitleToGameplayEvent());
+    }
+
+    private void HideHUD(GameObject canvas, RectTransform panel, List<Transform> buttons,
+        GraphicRaycaster raycaster, TweenCallback method)
+    {
         DOTween.Sequence()
-            .OnStart(() => _raycasterTitle.enabled = false)
-            .AppendCallback(() => StartCoroutine(HideButtons(_titleButtons)))
+            .AppendInterval(0.1f)
+            .OnStart(() => raycaster.enabled = false)
+            .AppendCallback(() => StartCoroutine(HideButtons(buttons)))
             .AppendInterval(0.5f)
-            .Append(_titlePanel.DOScale(Vector3.zero, 0.5f))
-            .AppendCallback(() => _titleCanvas.SetActive(false))
-            .OnComplete(() => StateController.RaiseTitleToGameplayEvent());
+            .Append(panel.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack))
+            .AppendCallback(() => canvas.SetActive(false))
+            .OnComplete(() => method());
+    }
+
+    private IEnumerator ShowButtons(List<Transform> buttons)
+    {
+        foreach (var button in buttons)
+        {
+            DOTween.Sequence()
+                .Append(button.DOScale(Vector3.one, 0.1f))
+                .Append(button.DOPunchScale(Vector3.one * 0.6f, 0.3f, 6, 0.7f).SetEase(Ease.OutCirc));
+
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    private IEnumerator HideButtons(List<Transform> buttons)
+    {
+        for (int i = buttons.Count - 1; i >= 0; i--)
+        {
+            buttons[i].DOScale(Vector3.zero, 0.3f);
+
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
     #endregion
@@ -159,56 +202,6 @@ public class UIPanel : StateBase
     }
 
     #endregion
-
-    #region Gameover Panel
-
-    private void ShowGameoverHUD()
-    {
-        DOTween.Sequence()
-            .OnStart(() =>
-            {
-                _gameoverCanvas.SetActive(true);
-                _gameoverPanel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);
-            })
-            .AppendInterval(1.2f)
-            .AppendCallback(() => StartCoroutine(ShowButtons(_gameoverButtons)))
-            .AppendInterval(0.5f)
-            .OnComplete(() => _raycasterGameover.enabled = true);
-    }
-
-    private void HideGameoverHUD()
-    {
-        DOTween.Sequence()
-            .OnStart(() => _raycasterGameover.enabled = false)
-            .AppendCallback(() => StartCoroutine(HideButtons(_gameoverButtons)))
-            .AppendInterval(0.5f)
-            .Append(_gameoverPanel.DOScale(Vector3.zero, 0.5f))
-            .OnComplete(() => _gameoverCanvas.SetActive(false));
-    }
-
-    #endregion
-
-    private IEnumerator ShowButtons(List<Transform> buttons)
-    {
-        foreach (var button in buttons)
-        {
-            DOTween.Sequence()
-                .Append(button.DOScale(Vector3.one, 0.1f))
-                .Append(button.DOPunchScale(Vector3.one * 0.6f, 0.3f, 6, 0.7f).SetEase(Ease.OutCirc));
-
-            yield return new WaitForSeconds(0.2f);
-        }
-    }
-
-    private IEnumerator HideButtons(List<Transform> buttons)
-    {
-        for (int i = buttons.Count - 1; i >= 0; i--)
-        {
-            buttons[i].DOScale(Vector3.zero, 0.2f);
-
-            yield return new WaitForSeconds(0.2f);
-        }
-    }
 
     private void CacheComponents()
     {

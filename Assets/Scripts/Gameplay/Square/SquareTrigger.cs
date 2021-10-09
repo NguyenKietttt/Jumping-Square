@@ -32,6 +32,13 @@ public class SquareTrigger : MonoBehaviour
         if (other.CompareTag("OpenSpike"))
         {
             Instantiate(_squareSO.ExplodeVFX, transform.position, Quaternion.identity);
+
+            // Slowwwww ttttttiiiimme
+            DOTween.Sequence()
+                .AppendCallback(() => Time.timeScale = 0.5f)
+                .AppendInterval(0.5f)
+                .AppendCallback(() => Time.timeScale = 1.0f);
+
             _mainCamera.DOShakePosition(0.5f, 0.5f);
 
             StateController.RaiseOnGameplayToGameoverEvent();
