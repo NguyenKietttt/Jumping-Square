@@ -59,14 +59,12 @@ public class HolderController : StateBase
     private void OnEnable()
     {
         StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
-
         SpikeController.endGameplayToGameoverEvent += HideHolder;
     }
 
     private void OnDisable()
     {
         StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
-
         SpikeController.endGameplayToGameoverEvent -= HideHolder;
     }
 
@@ -86,17 +84,20 @@ public class HolderController : StateBase
 
         _rightBorders.DOMoveX(BORDERS_POS, _holderSO.HolderShowDuration).SetEase(_holderSO.HolderShowEase);
         _leftBorders.DOMoveX(-BORDERS_POS, _holderSO.HolderShowDuration).SetEase(_holderSO.HolderShowEase)
-            .OnComplete(() => StartCoroutine(ShowSpikes()));
+            .OnComplete(() => ShowSpikes());
     }
 
-    private IEnumerator ShowSpikes()
+    private void ShowSpikes()
     {
-        yield return new WaitForSeconds(0.5f);
+        DOTween.Sequence().OnStart(() =>
+            {
+                _leftSpikesHolder.DOLocalMoveY(-LEFT_HOLDER_POS, _holderSO.SpikeShowDuration)
+                .SetEase(_holderSO.SpikeShowEase);
 
-        _leftSpikesHolder.DOLocalMoveY(-LEFT_HOLDER_POS, _holderSO.SpikeShowDuration)
-            .SetEase(_holderSO.SpikeShowEase);
-        _rightSpikesHolder.DOLocalMoveY(LEFT_HOLDER_POS, _holderSO.SpikeShowDuration)
-            .SetEase(_holderSO.SpikeShowEase)
+                _rightSpikesHolder.DOLocalMoveY(LEFT_HOLDER_POS, _holderSO.SpikeShowDuration)
+                    .SetEase(_holderSO.SpikeShowEase);
+            })
+            .AppendInterval(1.0f)
             .OnComplete(() => endTitleToGameplayEvent?.Invoke());
     }
 

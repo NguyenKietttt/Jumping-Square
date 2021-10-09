@@ -1,22 +1,43 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using DG.Tweening;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class SquareCollision : StateBase
 {
+    private readonly Quaternion INVERT_ROTATION = Quaternion.Euler(0, 0, -180.0f);
+
+
     public static event Action<bool> OnBorderCollideEvent;
 
 
-    private BoxCollider2D boxCollider2D;
-    private bool _isCollided;
-    
+    [Header("Configs")]
+    [SerializeField] private SquareSO _squareSO;
 
-    private void Awake() 
+    [Header("Validation")]
+    [SerializeField] private bool _isFailedConfig;
+
+    private Transform _transform;
+    private BoxCollider2D _boxCollider2D;
+    private Renderer _renderer;
+    private bool _isCollided;
+
+
+    private void OnValidate()
     {
-        CacheComponents();
+        CustomLogs.Instance.Warning(_squareSO == null, "squareSO is missing!!!");
+
+        _isFailedConfig = _squareSO == null;
     }
 
+    private void Awake()
+    {
+        if (_isFailedConfig)
+            enabled = false;
+
+        CacheComponents();
+    }
 
     private void OnEnable()
     {
@@ -24,7 +45,7 @@ public class SquareCollision : StateBase
         StateController.OnGameplayEvent += OnGameplay;
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         StateController.OnTitleEvent -= OnTitleMenu;
         StateController.OnGameplayEvent -= OnGameplay;
@@ -47,29 +68,37 @@ public class SquareCollision : StateBase
 
             OnBorderCollideEvent?.Invoke(_isCollided);
 
-            StartCoroutine(CheckDoubleJump());
+            SpawnCollidedVFX();
+            CheckDoubleJump();
         }
     }
 
 
-    private void CacheComponents()
+    private void CheckDoubleJump()
     {
-        boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
-    }
-
-    private IEnumerator CheckDoubleJump()
-    {
-        boxCollider2D.enabled = false;
-
-        yield return new WaitForSeconds(0.2f);
-
-        boxCollider2D.enabled = true;
+        DOTween.Sequence()
+            .AppendCallback(() => _boxCollider2D.enabled = false)
+            .AppendInterval(0.2f)
+            .OnComplete(() => _boxCollider2D.enabled = true);
     }
 
     private bool RandomJumpDirection()
     {
-        var result = (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
+        return (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
+    }
 
-        return result;
+    private void SpawnCollidedVFX()
+    {
+        if (_isCollided)
+            Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, Quaternion.identity);
+        else
+            Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, INVERT_ROTATION);
+    }
+
+    private void CacheComponents()
+    {
+        _transform = GetComponent<Transform>();
+        _boxCollider2D = GetComponent<BoxCollider2D>();
+        _renderer = GetComponent<Renderer>();
     }
 }

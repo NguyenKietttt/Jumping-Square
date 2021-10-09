@@ -9,7 +9,9 @@ public class StateController : MonoBehaviour
     public static event Action OnGameplayToGameoverEvent;
     public static event Action OnGameoverEvent;
 
-
+    /// <summary>
+    /// Raise by RestartButton in Hierarchy
+    /// </summary>
     public static void RaiseTitleEvent() => OnTitleEvent?.Invoke();
 
     public static void RaiseTitleToGameplayEvent() => OnTitleToGameplayEvent?.Invoke();
