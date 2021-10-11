@@ -1,11 +1,10 @@
-using System.Collections;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
 public class UIScore : StateBase
 {
-    private readonly Vector3 vector90 = new Vector3(0, 90.0f, 0);
+    private readonly Vector3 VECTOR_90 = new Vector3(0, 90.0f, 0);
 
 
     [Header("Configs")]
@@ -41,34 +40,38 @@ public class UIScore : StateBase
     {
         StateController.OnTitleEvent += OnTitleMenu;
 
-        ScoreController.displayScoreEvent += param => StartCoroutine(DisplayScore(param));
+        ScoreController.displayScoreEvent += param => DisplayScore(param);
     }
 
     private void OnDisable()
     {
         StateController.OnTitleEvent -= OnTitleMenu;
 
-        ScoreController.displayScoreEvent -= param => StartCoroutine(DisplayScore(param));
+        ScoreController.displayScoreEvent -= param => DisplayScore(param);
     }
 
-    
+
     public override void OnTitleMenu()
     {
         _scoreText.text = "0";
+        _scoreText.color = _scoreSO.NormalScore;
     }
 
 
-    private IEnumerator DisplayScore(int score)
+    private void DisplayScore(int score)
     {
-        _scoreTextRect.DORotate(_scoreTextRect.eulerAngles + vector90, _scoreSO.RotateTime);
+        DOTween.Sequence()
+            .Append(_scoreTextRect.DORotate(_scoreTextRect.eulerAngles + Vector3.up * 90.0f, _scoreSO.RotateTime))
+            .AppendCallback(() =>
+            {
+                _scoreText.text = score.ToString();
 
-        yield return new WaitForSeconds(_scoreSO.RotateTime);
-
-        _scoreText.text = score.ToString();
-
-        ChangeTextColor(score);
-
-        _scoreTextRect.DORotate(_scoreTextRect.eulerAngles - vector90, _scoreSO.RotateTime);
+                ChangeTextColor(score);
+            })
+            .OnComplete(() =>
+            {
+                _scoreTextRect.DORotate(_scoreTextRect.eulerAngles - Vector3.up * 90.0f, _scoreSO.RotateTime);
+            });
     }
 
     private void ChangeTextColor(int score)
