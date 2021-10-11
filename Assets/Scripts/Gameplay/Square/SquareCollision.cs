@@ -1,4 +1,3 @@
-using System.Collections;
 using System;
 using UnityEngine;
 using DG.Tweening;
@@ -9,7 +8,8 @@ public class SquareCollision : StateBase
     private readonly Quaternion INVERT_ROTATION = Quaternion.Euler(0, 0, -180.0f);
 
 
-    public static event Action<bool> OnBorderCollideEvent;
+    public static event Action<bool> onBorderCollideEvent;
+    public static event Action<AudioClip> impactSFXEvent;
 
 
     [Header("Configs")]
@@ -56,7 +56,7 @@ public class SquareCollision : StateBase
     {
         _isCollided = RandomJumpDirection();
 
-        OnBorderCollideEvent?.Invoke(_isCollided);
+        onBorderCollideEvent?.Invoke(_isCollided);
     }
 
 
@@ -64,9 +64,11 @@ public class SquareCollision : StateBase
     {
         if (other.gameObject.CompareTag("Border"))
         {
+            impactSFXEvent?.Invoke(_squareSO.GetSFXByName("Impact"));
+
             _isCollided = !_isCollided;
 
-            OnBorderCollideEvent?.Invoke(_isCollided);
+            onBorderCollideEvent?.Invoke(_isCollided);
 
             SpawnCollidedVFX();
             CheckDoubleJump();

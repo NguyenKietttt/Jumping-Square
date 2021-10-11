@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Square Data", menuName = "SciptableObject/Gameplay/Square Data")]
@@ -12,6 +13,9 @@ public class SquareSO : ScriptableObject
     [SerializeField] private GameObject collidedVFX;
     [SerializeField] private GameObject jumpVFX;
     [SerializeField] private GameObject explodeVFX;
+
+    [Header("SFX")]
+    [SerializeField] private List<SFXDict> sfxDict;
     
 
     #region Properties
@@ -24,5 +28,13 @@ public class SquareSO : ScriptableObject
     public GameObject JumpVFX => jumpVFX;
     public GameObject ExplodeVFX => explodeVFX;
 
+    public List<SFXDict> SfxDict => sfxDict;
+
     #endregion
+
+
+    public AudioClip GetSFXByName(string sfxName)
+    {
+        return SfxDict.Find(p => p.Name == sfxName).SFX;
+    }
 }

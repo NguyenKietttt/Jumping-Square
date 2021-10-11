@@ -14,6 +14,7 @@ public class HolderController : StateBase
 
 
     public static event Action endTitleToGameplayEvent;
+    public static event Action<AudioClip> holderSFXEvent;
 
 
     [Header("Configs")]
@@ -77,6 +78,8 @@ public class HolderController : StateBase
 
     private void ShowHolder()
     {
+        holderSFXEvent?.Invoke(_holderSO.GetSFXByName("Open"));
+
         _topSpikesHolder.DOMoveY(TOP_HOLDER_POS, _holderSO.HolderShowDuration)
             .SetEase(_holderSO.HolderShowEase);
         _bottomSpikesHolder.DOMoveY(TOP_HOLDER_POS, _holderSO.HolderShowDuration)
@@ -103,6 +106,8 @@ public class HolderController : StateBase
 
     private void HideHolder()
     {
+        holderSFXEvent?.Invoke(_holderSO.GetSFXByName("Close"));
+
         _topSpikesHolder.DOMoveY(TOP_HOLDER_OLD_POS, _holderSO.HolderHideDuration)
             .SetEase(_holderSO.HolderHideEase);
         _bottomSpikesHolder.DOMoveY(-TOP_HOLDER_OLD_POS, _holderSO.HolderHideDuration)

@@ -1,8 +1,12 @@
 using UnityEngine;
 using DG.Tweening;
+using System;
 
 public class SquareTrigger : MonoBehaviour
 {
+    public static event Action<AudioClip> deadSFXEvent;
+
+
     [Header("Configs")]
     [SerializeField] private SquareSO _squareSO;
 
@@ -31,6 +35,8 @@ public class SquareTrigger : MonoBehaviour
     {
         if (other.CompareTag("OpenSpike"))
         {
+            deadSFXEvent?.Invoke(_squareSO.GetSFXByName("Dead"));
+            
             Instantiate(_squareSO.ExplodeVFX, transform.position, Quaternion.identity);
 
             // Slowwwww ttttttiiiimme

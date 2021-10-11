@@ -125,7 +125,7 @@ public class UIPanel : StateBase
     #region Title Panel & Gameover Panel
 
     private void ShowHUD(GameObject canvas, RectTransform panel,
-        List<Transform> buttons, TweenCallback method)
+        List<Transform> buttons, TweenCallback callback)
     {
         DOTween.Sequence()
             .OnStart(() =>
@@ -136,7 +136,7 @@ public class UIPanel : StateBase
             .AppendInterval(1.2f)
             .AppendCallback(() => StartCoroutine(ShowButtons(buttons)))
             .AppendInterval(0.5f)
-            .OnComplete(() => method());
+            .OnComplete(() => callback());
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public class UIPanel : StateBase
     }
 
     private void HideHUD(GameObject canvas, RectTransform panel, List<Transform> buttons,
-        GraphicRaycaster raycaster, TweenCallback method)
+        GraphicRaycaster raycaster, TweenCallback callback)
     {
         DOTween.Sequence()
             .AppendInterval(0.1f)
@@ -158,7 +158,7 @@ public class UIPanel : StateBase
             .AppendInterval(0.5f)
             .Append(panel.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack))
             .AppendCallback(() => canvas.SetActive(false))
-            .OnComplete(() => method());
+            .OnComplete(() => callback());
     }
 
     private IEnumerator ShowButtons(List<Transform> buttons)

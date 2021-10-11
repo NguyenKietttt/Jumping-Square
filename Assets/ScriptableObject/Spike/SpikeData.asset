@@ -13,3 +13,6 @@ MonoBehaviour:
   m_Name: SpikeData
   m_EditorClassIdentifier: 
   spawnDeday: 0.7
+  sfxDict:
+  - name: Spike
+    sfx: {fileID: 8300000, guid: 1befa63d294b15947992c53fe0675df1, type: 3}

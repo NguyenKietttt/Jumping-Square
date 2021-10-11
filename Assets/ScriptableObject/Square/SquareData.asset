@@ -18,3 +18,10 @@ MonoBehaviour:
   collidedVFX: {fileID: 194062, guid: 8c27aeead6d968e4ba986702d6b84335, type: 3}
   jumpVFX: {fileID: 100000, guid: 83cd9cc9f9c88824ba18dc59b05ae328, type: 3}
   explodeVFX: {fileID: 8550054505309090576, guid: b7864935c0274c74aa6ab6541d22e726, type: 3}
+  sfxDict:
+  - name: Jump
+    sfx: {fileID: 8300000, guid: fdcea356281e6814ca16396efeba3b63, type: 3}
+  - name: Impact
+    sfx: {fileID: 8300000, guid: 678b6ce7593b43040982e4313e10fb82, type: 3}
+  - name: Dead
+    sfx: {fileID: 8300000, guid: 231b8ce30af9d5049bc21587bc93dd03, type: 3}
