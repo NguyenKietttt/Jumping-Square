@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using DG.Tweening;
+using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class SquareMovement : StateBase
 {
+    public static event Action<AudioClip> momventSFXEvent;
+
+    
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
     private readonly Vector3 VFX_JUMP_LEFT_OFFSET = new Vector3(0.3f, -0.5f, 0);
     private readonly Vector3 VFX_JUMP_RIGHT_OFFSET = new Vector3(-0.3f, -0.5f, 0);
@@ -47,7 +51,7 @@ public class SquareMovement : StateBase
 
         HolderController.endTitleToGameplayEvent += ShowSquare;
 
-        SquareCollision.OnBorderCollideEvent += param => Jump(param);
+        SquareCollision.onBorderCollideEvent += param => Jump(param);
     }
 
     private void OnDisable()
@@ -59,7 +63,7 @@ public class SquareMovement : StateBase
 
         HolderController.endTitleToGameplayEvent -= ShowSquare;
 
-        SquareCollision.OnBorderCollideEvent -= param => Jump(param);
+        SquareCollision.onBorderCollideEvent -= param => Jump(param);
     }
 
 
@@ -102,19 +106,21 @@ public class SquareMovement : StateBase
         if (_isFirstJump)
         {
             StateController.RaiseGameplayEvent();
-
             _isFirstJump = false;
+
+            momventSFXEvent?.Invoke(_squareSO.GetSFXByName("Jump"));
             return;
         }
 
         if (ctx.started)
         {
+            momventSFXEvent?.Invoke(_squareSO.GetSFXByName("Jump"));
+
             // Jump to an exact height
             var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
                 * (Physics2D.gravity.y * _squareRb.gravityScale));
 
             _squareRb.velocity = Vector2.zero;
-
 
             if (_isCollided)
             {
@@ -160,6 +166,8 @@ public class SquareMovement : StateBase
 
     private void ShowSquare()
     {
+        momventSFXEvent?.Invoke(_squareSO.GetSFXByName("Show"));
+
         DOTween.Sequence()
             .OnStart(() =>
                 {

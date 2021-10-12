@@ -10,6 +10,7 @@ public class SpikeController : StateBase
 
 
     public static event Action endGameplayToGameoverEvent;
+    public static event Action<AudioClip> spikeSFXEvent;
 
 
     [Header("Configs")]
@@ -50,7 +51,7 @@ public class SpikeController : StateBase
         StateController.OnTitleEvent += OnTitleMenu;
         StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
 
-        SquareCollision.OnBorderCollideEvent += param => MoveSelectedSpike(param);
+        SquareCollision.onBorderCollideEvent += param => MoveSelectedSpike(param);
         ScoreController.displayScoreEvent += param => SetSpikeSpawnedByScore(param);
     }
 
@@ -59,7 +60,7 @@ public class SpikeController : StateBase
         StateController.OnTitleEvent -= OnTitleMenu;
         StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
 
-        SquareCollision.OnBorderCollideEvent -= param => MoveSelectedSpike(param);
+        SquareCollision.onBorderCollideEvent -= param => MoveSelectedSpike(param);
         ScoreController.displayScoreEvent -= param => SetSpikeSpawnedByScore(param);
     }
 
@@ -117,6 +118,8 @@ public class SpikeController : StateBase
 
     private void SpawnSpikes(List<Transform> spikes)
     {
+        spikeSFXEvent?.Invoke(_spikeSO.GetSFXByName("Spike"));
+
         int spikeIndex;
 
         for (int i = 0; i < _spikesPerLevel; i++)
@@ -128,12 +131,14 @@ public class SpikeController : StateBase
             while (spikes[spikeIndex].tag == "OpenSpike");
 
             spikes[spikeIndex].tag = "OpenSpike";
-            spikes[spikeIndex].DOLocalMoveY(NEW_SPIKE_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.OutBack);
+            spikes[spikeIndex].DOLocalMoveY(NEW_SPIKE_POSITION, _spikeSO.SpawnDeday).SetEase(Ease.OutQuad);
         }
     }
 
     private void ReturnSpike(List<Transform> spikes)
     {
+        spikeSFXEvent?.Invoke(_spikeSO.GetSFXByName("Spike"));
+
         foreach (var spike in spikes)
         {
             if (spike.localPosition.y != OLD_SPIKE_POSITION)

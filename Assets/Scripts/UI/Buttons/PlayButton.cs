@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 
@@ -5,11 +6,31 @@ public class PlayButton : MonoBehaviour, IButtonAction
 {
     private readonly float Duration = 0.3f;
 
+
+    public static event Action<AudioClip> playButtonSFXEvent;
+
+
+    [Header("Configs")]
+    [SerializeField] private ButtonSO _buttonSO;
+
+    [Header("Validation")]
+    [SerializeField] private bool _isFailedConfig;
+
     private RectTransform _rectTransform;
 
 
+    private void OnValidate()
+    {
+        CustomLogs.Instance.Warning(_buttonSO == null, "buttonSO is missing!!!");
+
+        _isFailedConfig = _buttonSO == null;
+    }
+
     private void Awake() 
     {
+        if (_isFailedConfig)
+            enabled = false;
+
         _rectTransform = GetComponent<RectTransform>();
     }
 
@@ -26,6 +47,8 @@ public class PlayButton : MonoBehaviour, IButtonAction
 
     public void OnClick()
     {
+        playButtonSFXEvent?.Invoke(_buttonSO.GetSFXByName("Click"));
+
         _rectTransform.DOScale(Vector3.one * 2.0f, Duration).SetEase(Ease.OutCirc);
     }
 }

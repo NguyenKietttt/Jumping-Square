@@ -14,14 +14,14 @@ public class ScoreController : StateBase
     {
         StateController.OnTitleEvent += OnTitleMenu;
 
-        SquareCollision.OnBorderCollideEvent += param => UpdateScore();
+        SquareCollision.onBorderCollideEvent += param => UpdateScore();
     }
 
     private void OnDisable()
     {
         StateController.OnTitleEvent -= OnTitleMenu;
 
-        SquareCollision.OnBorderCollideEvent -= param => UpdateScore();
+        SquareCollision.onBorderCollideEvent -= param => UpdateScore();
     }
 
 
