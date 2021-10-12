@@ -17,17 +17,17 @@ public class AudioController : MonoBehaviour
 
     private void OnEnable()
     {
-        SquareMovement.momventSFXEvent += param => PlaySFX(param);
-        SquareCollision.impactSFXEvent += param => PlaySFX(param);
-        SquareTrigger.deadSFXEvent += param => PlaySFX(param);
+        EventDispatcher.RegisterListener(EventsID.SQUARE_MOVEMENT_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RegisterListener(EventsID.SQUARE_COLLIDE_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RegisterListener(EventsID.SQUARE_TRIGGER_SFX, (param) => PlaySFX(param));
 
-        HolderController.holderSFXEvent += param => PlaySFX(param);
-        SpikeController.spikeSFXEvent += param => PlaySFX(param);
+        EventDispatcher.RegisterListener(EventsID.HOLDER_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RegisterListener(EventsID.SPIKE_SFX, (param) => PlaySFX(param));
 
-        UIPanel.panelSFXEvent += param => PlaySFX(param);
+        EventDispatcher.RegisterListener(EventsID.PANEL_SFX, (param) => PlaySFX(param));
 
-        PlayButton.playButtonSFXEvent += param => PlaySFX(param);
-        SoundButton.soundButtonSFXEvent += param => PlaySFX(param);
+        EventDispatcher.RegisterListener(EventsID.BUTTON_PLAY_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RegisterListener(EventsID.BUTTON_SOUND_SFX, (param) => PlaySFX(param));
     }
 
     private void Start()
@@ -37,23 +37,23 @@ public class AudioController : MonoBehaviour
 
     private void OnDisable()
     {
-        SquareMovement.momventSFXEvent -= param => PlaySFX(param);
-        SquareCollision.impactSFXEvent -= param => PlaySFX(param);
-        SquareTrigger.deadSFXEvent -= param => PlaySFX(param);
+        EventDispatcher.RemoveListener(EventsID.SQUARE_MOVEMENT_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RemoveListener(EventsID.SQUARE_COLLIDE_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RemoveListener(EventsID.SQUARE_TRIGGER_SFX, (param) => PlaySFX(param));
 
-        HolderController.holderSFXEvent -= param => PlaySFX(param);
-        SpikeController.spikeSFXEvent -= param => PlaySFX(param);
+        EventDispatcher.RemoveListener(EventsID.HOLDER_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RemoveListener(EventsID.SPIKE_SFX, (param) => PlaySFX(param));
 
-        UIPanel.panelSFXEvent -= param => PlaySFX(param);
+        EventDispatcher.RemoveListener(EventsID.PANEL_SFX, (param) => PlaySFX(param));
 
-        PlayButton.playButtonSFXEvent -= param => PlaySFX(param);
-        SoundButton.soundButtonSFXEvent -= param => PlaySFX(param);
+        EventDispatcher.RemoveListener(EventsID.BUTTON_PLAY_SFX, (param) => PlaySFX(param));
+        EventDispatcher.RemoveListener(EventsID.BUTTON_SOUND_SFX, (param) => PlaySFX(param));
     }
 
 
-    private void PlaySFX(AudioClip clip)
+    private void PlaySFX(object clip)
     {
-        _sfxSource.PlayOneShot(clip);
+        _sfxSource.PlayOneShot(clip as AudioClip);
     }
 
     private void PlayMusic()

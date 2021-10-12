@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -16,6 +17,7 @@ public class UIScore : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
+    private Action<object> _onTitleRef, _displayScoreRef;
     private TextMeshProUGUI _scoreText;
     private RectTransform _scoreTextRect;
 
@@ -34,39 +36,42 @@ public class UIScore : StateBase
             enabled = false;
 
         CacheComponents();
+        CacheEvents();
     }
 
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
+        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
 
-        ScoreController.displayScoreEvent += param => DisplayScore(param);
+        EventDispatcher.RegisterListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
+        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
 
-        ScoreController.displayScoreEvent -= param => DisplayScore(param);
+        EventDispatcher.RemoveListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
 
-    public override void OnTitleMenu()
+    public override void OnTitle()
     {
         _scoreText.text = "0";
         _scoreText.color = _scoreSO.NormalScore;
     }
 
 
-    private void DisplayScore(int score)
+    private void DisplayScore(object score)
     {
+        var intScore = (int)score;
+        
         DOTween.Sequence()
             .Append(_scoreTextRect.DORotate(_scoreTextRect.eulerAngles + Vector3.up * 90.0f, _scoreSO.RotateTime))
             .AppendCallback(() =>
             {
                 _scoreText.text = score.ToString();
 
-                ChangeTextColor(score);
+                ChangeTextColor(intScore);
             })
             .OnComplete(() =>
             {
@@ -86,5 +91,12 @@ public class UIScore : StateBase
     {
         _scoreText = _score.GetComponent<TextMeshProUGUI>();
         _scoreTextRect = _score.GetComponent<RectTransform>();
+    }
+
+    private void CacheEvents()
+    {
+        _onTitleRef = (param) => OnTitle();
+
+        _displayScoreRef = (param) => DisplayScore(param);
     }
 }

@@ -1,12 +1,8 @@
 using UnityEngine;
 using DG.Tweening;
-using System;
 
 public class SquareTrigger : MonoBehaviour
 {
-    public static event Action<AudioClip> deadSFXEvent;
-
-
     [Header("Configs")]
     [SerializeField] private SquareSO _squareSO;
 
@@ -35,19 +31,26 @@ public class SquareTrigger : MonoBehaviour
     {
         if (other.CompareTag("OpenSpike"))
         {
-            deadSFXEvent?.Invoke(_squareSO.GetSFXByName("Dead"));
-            
-            Instantiate(_squareSO.ExplodeVFX, transform.position, Quaternion.identity);
+            EventDispatcher.PostEvent(EventsID.SQUARE_TRIGGER_SFX, _squareSO.GetSFXByName("Dead"));
+            EventDispatcher.PostEvent(EventsID.SQUARE_DEAD_VFX);
 
-            // Slowwwww ttttttiiiimme
-            DOTween.Sequence()
-                .AppendCallback(() => Time.timeScale = 0.5f)
-                .AppendInterval(0.5f)
-                .AppendCallback(() => Time.timeScale = 1.0f);
-
-            _mainCamera.DOShakePosition(0.5f, 0.5f);
+            SlowTime();
+            ShakeCamera();
 
             StateController.RaiseOnGameplayToGameoverEvent();
         }
+    }
+
+    private void ShakeCamera()
+    {
+        _mainCamera.DOShakePosition(0.5f, 0.5f);
+    }
+
+    private void SlowTime()
+    {
+        DOTween.Sequence()
+            .AppendCallback(() => Time.timeScale = 0.5f)
+            .AppendInterval(0.5f)
+            .AppendCallback(() => Time.timeScale = 1.0f);
     }
 }

@@ -221,19 +221,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 257355175}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 591669797}
-        m_TargetAssemblyTypeName: StateController, Assembly-CSharp
-        m_MethodName: RaiseTitleEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &257355175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,6 +312,18 @@ MonoBehaviour:
         - m_Target: {fileID: 257355178}
           m_TargetAssemblyTypeName: PlayButton, Assembly-CSharp
           m_MethodName: OnClick
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 591669797}
+          m_TargetAssemblyTypeName: StateController, Assembly-CSharp
+          m_MethodName: RaiseTitleState
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -2736,6 +2736,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Square
       objectReference: {fileID: 0}
+    - target: {fileID: 588030649784580947, guid: a8e7c55ac01e0864bb1d95156c3a252f, type: 3}
+      propertyPath: m_BodyType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 588030649784580958, guid: a8e7c55ac01e0864bb1d95156c3a252f, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -2780,11 +2784,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1409830409279333026, guid: a8e7c55ac01e0864bb1d95156c3a252f, type: 3}
-      propertyPath: m_audioClip
-      value: 
-      objectReference: {fileID: 8300000, guid: 678b6ce7593b43040982e4313e10fb82, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: a8e7c55ac01e0864bb1d95156c3a252f, type: 3}
 --- !u!1001 &1267481573774113393
 PrefabInstance:

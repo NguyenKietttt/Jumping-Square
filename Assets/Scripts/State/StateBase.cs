@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class StateBase : MonoBehaviour
 {
-    public virtual void OnTitleMenu() { }
+    public virtual void OnTitle() { }
 
     public virtual void OnTitleToGameplay() { }
 

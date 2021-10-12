@@ -7,9 +7,6 @@ using System;
 
 public class UIPanel : StateBase
 {
-    public static event Action<AudioClip> panelSFXEvent;
-
-
     [Header("Configs")]
     [SerializeField] private PanelSO _panelSO;
     [SerializeField] private ButtonSO _buttonSO;
@@ -31,6 +28,7 @@ public class UIPanel : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
+    private Action<object> _onTitleRef, _onTitleToGameplayRef, _onGameplayRef, _onGameoverRef;
     private GraphicRaycaster _raycasterTitle, _raycasterGameover;
     private bool _isFirstPlay;
 
@@ -49,8 +47,8 @@ public class UIPanel : StateBase
         CustomLogs.Instance.Warning(_gameoverCanvas == null, "gameoverCanvas is missing!!!");
         CustomLogs.Instance.Warning(_gameoverPanel == null, "gameoverPanel is missing!!!");
 
-        _isFailedConfig = _panelSO == null || _buttonSO == null || _titleCanvas == null 
-            || _titlePanel == null || _gameplayCanvas == null || _gameplayPanel == null 
+        _isFailedConfig = _panelSO == null || _buttonSO == null || _titleCanvas == null
+            || _titlePanel == null || _gameplayCanvas == null || _gameplayPanel == null
             || _gameoverCanvas == null || _gameoverPanel == null;
     }
 
@@ -60,37 +58,34 @@ public class UIPanel : StateBase
             enabled = false;
 
         CacheComponents();
+        CacheEvents();
 
         _isFirstPlay = true;
     }
 
     private void Start()
     {
-        StateController.RaiseTitleEvent();
+        StateController.RaiseTitleState();
     }
 
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
-        StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
-
-        StateController.OnGameplayEvent += OnGameplay;
-
-        StateController.OnGameoverEvent += OnGameOver;
+        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RegisterListener(EventsID.TITLE_TO_GAMEPLAY_STATE, _onTitleToGameplayRef);
+        EventDispatcher.RegisterListener(EventsID.GAMEPLAY_STATE, _onGameplayRef);
+        EventDispatcher.RegisterListener(EventsID.GAMEOVER_STATE, _onGameoverRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
-        StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
-
-        StateController.OnGameplayEvent -= OnGameplay;
-
-        StateController.OnGameoverEvent -= OnGameOver;
+        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RemoveListener(EventsID.TITLE_TO_GAMEPLAY_STATE, _onTitleToGameplayRef);
+        EventDispatcher.RemoveListener(EventsID.GAMEPLAY_STATE, _onGameplayRef);
+        EventDispatcher.RemoveListener(EventsID.GAMEOVER_STATE, _onGameoverRef);
     }
 
 
-    public override void OnTitleMenu()
+    public override void OnTitle()
     {
         if (!_isFirstPlay)
         {
@@ -139,7 +134,7 @@ public class UIPanel : StateBase
     private void ShowHUD(GameObject canvas, RectTransform panel,
         List<Transform> buttons, TweenCallback callback)
     {
-        panelSFXEvent?.Invoke(_panelSO.GetSFXByName("Show"));
+        EventDispatcher.PostEvent(EventsID.PANEL_SFX, _panelSO.GetSFXByName("Show"));
 
         DOTween.Sequence()
             .OnStart(() =>
@@ -159,7 +154,7 @@ public class UIPanel : StateBase
     public void HideTitleHUD()
     {
         HideHUD(_titleCanvas, _titlePanel, _titleButtons, _raycasterTitle,
-            () => StateController.RaiseTitleToGameplayEvent());
+            () => StateController.RaiseTitleToGameplayState());
     }
 
     private void HideHUD(GameObject canvas, RectTransform panel, List<Transform> buttons,
@@ -170,7 +165,7 @@ public class UIPanel : StateBase
             .OnStart(() => raycaster.enabled = false)
             .AppendCallback(() => StartCoroutine(HideButtons(buttons)))
             .AppendInterval(0.5f)
-            .AppendCallback(() => panelSFXEvent?.Invoke(_panelSO.GetSFXByName("Hide")))
+            .AppendCallback(() => EventDispatcher.PostEvent(EventsID.PANEL_SFX, _panelSO.GetSFXByName("Hide")))
             .Append(panel.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack))
             .AppendCallback(() => canvas.SetActive(false))
             .OnComplete(() => callback());
@@ -180,7 +175,7 @@ public class UIPanel : StateBase
     {
         foreach (var button in buttons)
         {
-            panelSFXEvent?.Invoke(_buttonSO.GetSFXByName("Show"));
+            EventDispatcher.PostEvent(EventsID.PANEL_SFX, _buttonSO.GetSFXByName("Show"));
 
             DOTween.Sequence()
                 .Append(button.DOScale(Vector3.one, 0.1f))
@@ -224,5 +219,13 @@ public class UIPanel : StateBase
     {
         _raycasterTitle = _titleCanvas.GetComponent<GraphicRaycaster>();
         _raycasterGameover = _gameoverCanvas.GetComponent<GraphicRaycaster>();
+    }
+
+    private void CacheEvents()
+    {
+        _onTitleRef = (param) => OnTitle();
+        _onTitleToGameplayRef = (param) => OnTitleToGameplay();
+        _onGameplayRef = (param) => OnGameplay();
+        _onGameoverRef = (param) => OnGameOver();
     }
 }

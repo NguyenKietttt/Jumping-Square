@@ -9,10 +9,6 @@ public class SpikeController : StateBase
     private readonly float NEW_SPIKE_POSITION = -3.5f;
 
 
-    public static event Action endGameplayToGameoverEvent;
-    public static event Action<AudioClip> spikeSFXEvent;
-
-
     [Header("Configs")]
     [SerializeField] private SpikeSO _spikeSO;
 
@@ -23,6 +19,7 @@ public class SpikeController : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
+    private Action<object> _onTitleRef, _onGameplayToGameoverRef, _displayScoreRef, _collidedSquareRef;
     private List<Transform> _leftSpikes, _rightSpikes;
     private int _spikesPerLevel;
 
@@ -44,28 +41,30 @@ public class SpikeController : StateBase
 
         _leftSpikes = GetHolderChilds(_leftSpikeHolder);
         _rightSpikes = GetHolderChilds(_rightSpikeHolder);
+
+        CacheEvents();
     }
 
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
-        StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
+        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RegisterListener(EventsID.GAMEPLAY_TO_GAMEOVER_STATE, _onGameplayToGameoverRef);
 
-        SquareCollision.onBorderCollideEvent += param => MoveSelectedSpike(param);
-        ScoreController.displayScoreEvent += param => SetSpikeSpawnedByScore(param);
+        EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
+        EventDispatcher.RegisterListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
-        StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
+        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RemoveListener(EventsID.GAMEPLAY_TO_GAMEOVER_STATE, _onGameplayToGameoverRef);
 
-        SquareCollision.onBorderCollideEvent -= param => MoveSelectedSpike(param);
-        ScoreController.displayScoreEvent -= param => SetSpikeSpawnedByScore(param);
+        EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
+        EventDispatcher.RemoveListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
 
-    public override void OnTitleMenu()
+    public override void OnTitle()
     {
         _spikesPerLevel = 1;
     }
@@ -76,7 +75,7 @@ public class SpikeController : StateBase
             .AppendCallback(() => ReturnSpike(_leftSpikes))
             .AppendCallback(() => ReturnSpike(_rightSpikes))
             .AppendInterval(1.3f)
-            .OnComplete(() => endGameplayToGameoverEvent?.Invoke());
+            .OnComplete(() => EventDispatcher.PostEvent(EventsID.HIDE_HOLDER));
     }
 
 
@@ -92,19 +91,23 @@ public class SpikeController : StateBase
         return childs;
     }
 
-    private void SetSpikeSpawnedByScore(int score)
+    private void SetSpikeSpawnedByScore(object score)
     {
-        if (score >= 5 && score < 10)
+        var intScore = (int)score;
+
+        if (intScore >= 5 && intScore < 10)
             _spikesPerLevel = 2;
-        else if (score >= 10 && score < 15)
+        else if (intScore >= 10 && intScore < 15)
             _spikesPerLevel = 3;
-        else if (score >= 15 && score < 100)
+        else if (intScore >= 15 && intScore < 100)
             _spikesPerLevel = 4;
     }
 
-    private void MoveSelectedSpike(bool isCollided)
+    private void MoveSelectedSpike(object isCollided)
     {
-        if (isCollided)
+        var boolIsCollided = (bool)isCollided;
+
+        if (boolIsCollided)
         {
             SpawnSpikes(_leftSpikes);
             ReturnSpike(_rightSpikes);
@@ -118,7 +121,7 @@ public class SpikeController : StateBase
 
     private void SpawnSpikes(List<Transform> spikes)
     {
-        spikeSFXEvent?.Invoke(_spikeSO.GetSFXByName("Spike"));
+        EventDispatcher.PostEvent(EventsID.SPIKE_SFX, _spikeSO.GetSFXByName("Spike"));
 
         int spikeIndex;
 
@@ -137,7 +140,7 @@ public class SpikeController : StateBase
 
     private void ReturnSpike(List<Transform> spikes)
     {
-        spikeSFXEvent?.Invoke(_spikeSO.GetSFXByName("Spike"));
+        EventDispatcher.PostEvent(EventsID.SPIKE_SFX, _spikeSO.GetSFXByName("Spike"));
 
         foreach (var spike in spikes)
         {
@@ -147,5 +150,15 @@ public class SpikeController : StateBase
                 spike.DOLocalMoveY(OLD_SPIKE_POSITION, _spikeSO.SpawnDeday);
             }
         }
+    }
+
+    private void CacheEvents()
+    {
+        _onTitleRef = (param) => OnTitle();
+        _onGameplayToGameoverRef = (param) => OnGameplayToGameover();
+
+        _displayScoreRef = (param) => SetSpikeSpawnedByScore(param);
+
+        _collidedSquareRef = (param) => MoveSelectedSpike(param);
     }
 }

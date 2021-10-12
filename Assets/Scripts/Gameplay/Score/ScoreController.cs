@@ -1,31 +1,32 @@
 using System;
-using UnityEngine;
 
 public class ScoreController : StateBase
 {
-    public static event Action<int> displayScoreEvent;
-
-
+    private Action<object> _onTitleRef, _collidedSquareRef;
     private int _totalScore;
     private bool _isStartJump;
 
 
+    private void Awake()
+    {
+        CacheEvents();
+    }
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
+        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
 
-        SquareCollision.onBorderCollideEvent += param => UpdateScore();
+        EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
+        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
 
-        SquareCollision.onBorderCollideEvent -= param => UpdateScore();
+        EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
 
-    public override void OnTitleMenu()
+    public override void OnTitle()
     {
         _totalScore = 0;
         _isStartJump = true;
@@ -39,9 +40,16 @@ public class ScoreController : StateBase
             _isStartJump = false;
             return;
         }
-        
+
         _totalScore++;
 
-        displayScoreEvent?.Invoke(_totalScore);
+        EventDispatcher.PostEvent(EventsID.DISPLAY_SCORE, _totalScore);
+    }
+
+    private void CacheEvents()
+    {
+        _onTitleRef = (param) => OnTitle();
+
+        _collidedSquareRef = (param) => UpdateScore();
     }
 }

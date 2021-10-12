@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 using System;
@@ -11,10 +10,6 @@ public class HolderController : StateBase
     private readonly float LEFT_HOLDER_OLD_POS = 5.5f;
     private readonly float BORDERS_POS = 8.5f;
     private readonly float BORDERS_OLD_POS = 10.5f;
-
-
-    public static event Action endTitleToGameplayEvent;
-    public static event Action<AudioClip> holderSFXEvent;
 
 
     [Header("Configs")]
@@ -33,6 +28,7 @@ public class HolderController : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
+    private Action<object> _onTitleToGameplayRef, _hideHolderRef;
 
     private void OnValidate()
     {
@@ -55,18 +51,20 @@ public class HolderController : StateBase
     {
         if (_isFailedConfig)
             enabled = false;
+
+        CacheEvents();
     }
 
     private void OnEnable()
     {
-        StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
-        SpikeController.endGameplayToGameoverEvent += HideHolder;
+        EventDispatcher.RegisterListener(EventsID.TITLE_TO_GAMEPLAY_STATE, _onTitleToGameplayRef);
+        EventDispatcher.RegisterListener(EventsID.HIDE_HOLDER, _hideHolderRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
-        SpikeController.endGameplayToGameoverEvent -= HideHolder;
+        EventDispatcher.RemoveListener(EventsID.TITLE_TO_GAMEPLAY_STATE, _onTitleToGameplayRef);
+        EventDispatcher.RemoveListener(EventsID.HIDE_HOLDER, _hideHolderRef);
     }
 
 
@@ -78,7 +76,7 @@ public class HolderController : StateBase
 
     private void ShowHolder()
     {
-        holderSFXEvent?.Invoke(_holderSO.GetSFXByName("Open"));
+        EventDispatcher.PostEvent(EventsID.HOLDER_SFX, _holderSO.GetSFXByName("Open"));
 
         _topSpikesHolder.DOMoveY(TOP_HOLDER_POS, _holderSO.HolderShowDuration)
             .SetEase(_holderSO.HolderShowEase);
@@ -101,12 +99,12 @@ public class HolderController : StateBase
                     .SetEase(_holderSO.SpikeShowEase);
             })
             .AppendInterval(1.0f)
-            .OnComplete(() => endTitleToGameplayEvent?.Invoke());
+            .OnComplete(() => EventDispatcher.PostEvent(EventsID.SHOW_SQUARE));
     }
 
     private void HideHolder()
     {
-        holderSFXEvent?.Invoke(_holderSO.GetSFXByName("Close"));
+        EventDispatcher.PostEvent(EventsID.HOLDER_SFX, _holderSO.GetSFXByName("Close"));
 
         _topSpikesHolder.DOMoveY(TOP_HOLDER_OLD_POS, _holderSO.HolderHideDuration)
             .SetEase(_holderSO.HolderHideEase);
@@ -123,5 +121,11 @@ public class HolderController : StateBase
         _leftSpikesHolder.DOLocalMoveY(-LEFT_HOLDER_OLD_POS, _holderSO.SpikeHideDuration);
         _rightSpikesHolder.DOLocalMoveY(LEFT_HOLDER_OLD_POS, _holderSO.SpikeHideDuration)
             .OnComplete(() => StateController.RaiseGameoverEvent());
+    }
+
+    private void CacheEvents()
+    {
+        _onTitleToGameplayRef = (param) => OnTitleToGameplay();
+        _hideHolderRef = (param) => HideHolder();
     }
 }
