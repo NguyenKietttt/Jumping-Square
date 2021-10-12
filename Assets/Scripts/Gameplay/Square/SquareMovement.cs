@@ -7,7 +7,7 @@ using System;
 [RequireComponent(typeof(BoxCollider2D))]
 public class SquareMovement : StateBase
 {
-    public static event Action<AudioClip> jumpSFXEvent;
+    public static event Action<AudioClip> momventSFXEvent;
 
     
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
@@ -108,13 +108,13 @@ public class SquareMovement : StateBase
             StateController.RaiseGameplayEvent();
             _isFirstJump = false;
 
-            jumpSFXEvent?.Invoke(_squareSO.GetSFXByName("Jump"));
+            momventSFXEvent?.Invoke(_squareSO.GetSFXByName("Jump"));
             return;
         }
 
         if (ctx.started)
         {
-            jumpSFXEvent?.Invoke(_squareSO.GetSFXByName("Jump"));
+            momventSFXEvent?.Invoke(_squareSO.GetSFXByName("Jump"));
 
             // Jump to an exact height
             var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
@@ -166,6 +166,8 @@ public class SquareMovement : StateBase
 
     private void ShowSquare()
     {
+        momventSFXEvent?.Invoke(_squareSO.GetSFXByName("Show"));
+
         DOTween.Sequence()
             .OnStart(() =>
                 {

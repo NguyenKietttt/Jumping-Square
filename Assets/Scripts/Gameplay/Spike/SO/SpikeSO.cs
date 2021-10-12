@@ -8,14 +8,14 @@ public class SpikeSO : ScriptableObject
     [SerializeField] [Range(0.0f, 1.0f)] private float spawnDeday;
 
     [Header("SFX")]
-    [SerializeField] private List<SFXDict> sfxDict;
+    [SerializeField] private List<AudioDict> sfxDict;
 
 
     #region Properties
 
     public float SpawnDeday => spawnDeday;
 
-    public List<SFXDict> SfxDict => sfxDict;
+    public List<AudioDict> SfxDict => sfxDict;
 
     #endregion
 

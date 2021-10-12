@@ -15,7 +15,7 @@ public class SquareSO : ScriptableObject
     [SerializeField] private GameObject explodeVFX;
 
     [Header("SFX")]
-    [SerializeField] private List<SFXDict> sfxDict;
+    [SerializeField] private List<AudioDict> sfxDict;
     
 
     #region Properties
@@ -28,7 +28,7 @@ public class SquareSO : ScriptableObject
     public GameObject JumpVFX => jumpVFX;
     public GameObject ExplodeVFX => explodeVFX;
 
-    public List<SFXDict> SfxDict => sfxDict;
+    public List<AudioDict> SfxDict => sfxDict;
 
     #endregion
 

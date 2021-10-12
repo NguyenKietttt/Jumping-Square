@@ -23,7 +23,7 @@ public class HolderSO : ScriptableObject
     [SerializeField] private float spikeHideDuration;
 
     [Header("SFX")]
-    [SerializeField] private List<SFXDict> sfxDict;
+    [SerializeField] private List<AudioDict> sfxDict;
     
 
     #region Properties
@@ -37,7 +37,7 @@ public class HolderSO : ScriptableObject
     public Ease SpikeShowEase => spikeShowEase;
     public float SpikeHideDuration => spikeHideDuration;
 
-    public List<SFXDict> SfxDict => sfxDict;
+    public List<AudioDict> SfxDict => sfxDict;
 
     #endregion
 
