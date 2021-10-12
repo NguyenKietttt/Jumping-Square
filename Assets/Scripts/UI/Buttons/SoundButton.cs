@@ -74,14 +74,11 @@ public class SoundButton : MonoBehaviour, IButtonAction
     private void ChangeSoundIcon()
     {
         if (_isSoundOn)
-        {
             _imageSrc.sprite = _soundBtnSprites[1];
-            _isSoundOn = false;
-        }
         else
-        {
             _imageSrc.sprite = _soundBtnSprites[0];
-            _isSoundOn = true;
-        }
+
+
+        _isSoundOn = !_isSoundOn;
     }
 }

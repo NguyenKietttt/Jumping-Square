@@ -682,19 +682,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 574808053}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 826482569}
-        m_TargetAssemblyTypeName: UIPanel, Assembly-CSharp
-        m_MethodName: HideTitleHUD
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &574808053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -785,6 +773,18 @@ MonoBehaviour:
         - m_Target: {fileID: 574808056}
           m_TargetAssemblyTypeName: PlayButton, Assembly-CSharp
           m_MethodName: OnClick
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 826482569}
+          m_TargetAssemblyTypeName: UIPanel, Assembly-CSharp
+          m_MethodName: HideTitleHUD
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1048,6 +1048,18 @@ MonoBehaviour:
         - m_Target: {fileID: 719555904}
           m_TargetAssemblyTypeName: SoundButton, Assembly-CSharp
           m_MethodName: OnClick
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1646174406}
+          m_TargetAssemblyTypeName: AudioController, Assembly-CSharp
+          m_MethodName: ToggleAudio
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

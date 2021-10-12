@@ -7,6 +7,13 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioSource _sfxSource;
     [SerializeField] private AudioSource _musicSource;
 
+    private bool _isToggle;
+
+
+    private void Awake()
+    {
+        _isToggle = true;
+    }
 
     private void OnEnable()
     {
@@ -23,7 +30,7 @@ public class AudioController : MonoBehaviour
         SoundButton.soundButtonSFXEvent += param => PlaySFX(param);
     }
 
-    private void Start() 
+    private void Start()
     {
         PlayMusic();
     }
@@ -52,5 +59,15 @@ public class AudioController : MonoBehaviour
     private void PlayMusic()
     {
         _musicSource.DOFade(1.0f, 0.5f);
+    }
+
+    public void ToggleAudio()
+    {
+        if (_isToggle)
+            _musicSource.volume = 0;
+        else
+            _musicSource.volume = 1;
+
+        _isToggle = !_isToggle;
     }
 }
