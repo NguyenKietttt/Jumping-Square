@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System;
 
-public class UIPanel : StateBase
+public class UIPanelController : StateBase
 {
     [Header("Configs")]
     [SerializeField] private PanelSO _panelSO;
@@ -89,8 +89,7 @@ public class UIPanel : StateBase
     {
         if (!_isFirstPlay)
         {
-            DOTween.Sequence()
-                .AppendCallback(() =>
+            DOTween.Sequence().AppendCallback(() =>
                 {
                     HideHUD(_gameoverCanvas, _gameoverPanel, _gameoverButtons, _raycasterGameover,
                         () => { });
@@ -136,8 +135,7 @@ public class UIPanel : StateBase
     {
         EventDispatcher.PostEvent(EventsID.PANEL_SFX, _panelSO.GetSFXByName("Show"));
 
-        DOTween.Sequence()
-            .OnStart(() =>
+        DOTween.Sequence().OnStart(() =>
             {
                 canvas.SetActive(true);
                 panel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);

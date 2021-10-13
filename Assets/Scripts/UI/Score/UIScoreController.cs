@@ -3,9 +3,12 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
-public class UIScore : StateBase
+public class UIScoreController : MonoBehaviour
 {
     private readonly Vector3 VECTOR_90 = new Vector3(0, 90.0f, 0);
+    
+    
+    private Action<object> _resetScoreRef, _displayScoreRef;
 
 
     [Header("Configs")]
@@ -17,7 +20,6 @@ public class UIScore : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private Action<object> _onTitleRef, _displayScoreRef;
     private TextMeshProUGUI _scoreText;
     private RectTransform _scoreTextRect;
 
@@ -41,20 +43,20 @@ public class UIScore : StateBase
 
     private void OnEnable()
     {
-        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RegisterListener(EventsID.RESET_SCORE, _resetScoreRef);
 
         EventDispatcher.RegisterListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
     private void OnDisable()
     {
-        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RemoveListener(EventsID.RESET_SCORE, _resetScoreRef);
 
         EventDispatcher.RemoveListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
 
-    public override void OnTitle()
+    public void ResetScore()
     {
         _scoreText.text = "0";
         _scoreText.color = _scoreSO.NormalScore;
@@ -95,7 +97,7 @@ public class UIScore : StateBase
 
     private void CacheCallbacks()
     {
-        _onTitleRef = (param) => OnTitle();
+        _resetScoreRef = (param) => ResetScore();
 
         _displayScoreRef = (param) => DisplayScore(param);
     }

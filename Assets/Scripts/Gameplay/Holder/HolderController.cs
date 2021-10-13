@@ -2,23 +2,23 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 
-public class HolderController : StateBase
+public class HolderController : MonoBehaviour
 {
     private readonly float TOP_HOLDER_POS = 0.0f;
     private readonly float TOP_HOLDER_OLD_POS = 1.0f;
-    private readonly float LEFT_HOLDER_POS = 4.5f;
-    private readonly float LEFT_HOLDER_OLD_POS = 5.5f;
+    private readonly float SPIKE_HOLDER_POS = 4.5f;
+    private readonly float SPIKE_HOLDER_OLD_POS = 5.5f;
     private readonly float BORDERS_POS = 8.5f;
     private readonly float BORDERS_OLD_POS = 10.5f;
 
-    
-    private Action<object> _onTitleToGameplayRef, _hideHolderRef;
+
+    private Action<object> _showHolderRef, _hideHolderRef;
 
 
     [Header("Configs")]
     [SerializeField] private HolderSO _holderSO;
 
-    [Header("Spikes")]
+    [Header("Holders")]
     [SerializeField] private Transform _topSpikesHolder;
     [SerializeField] private Transform _bottomSpikesHolder;
     [SerializeField] private Transform _leftSpikesHolder;
@@ -59,75 +59,86 @@ public class HolderController : StateBase
 
     private void OnEnable()
     {
-        EventDispatcher.RegisterListener(EventsID.TITLE_TO_GAMEPLAY_STATE, _onTitleToGameplayRef);
+        EventDispatcher.RegisterListener(EventsID.SHOW_HOLDER, _showHolderRef);
         EventDispatcher.RegisterListener(EventsID.HIDE_HOLDER, _hideHolderRef);
     }
 
     private void OnDisable()
     {
-        EventDispatcher.RemoveListener(EventsID.TITLE_TO_GAMEPLAY_STATE, _onTitleToGameplayRef);
+        EventDispatcher.RemoveListener(EventsID.SHOW_HOLDER, _showHolderRef);
         EventDispatcher.RemoveListener(EventsID.HIDE_HOLDER, _hideHolderRef);
     }
 
-
-    public override void OnTitleToGameplay()
-    {
-        ShowHolder();
-    }
-
+    
+    #region Holder
 
     private void ShowHolder()
     {
         EventDispatcher.PostEvent(EventsID.HOLDER_SFX, _holderSO.GetSFXByName("Open"));
 
-        _topSpikesHolder.DOMoveY(TOP_HOLDER_POS, _holderSO.HolderShowDuration)
-            .SetEase(_holderSO.HolderShowEase);
-        _bottomSpikesHolder.DOMoveY(TOP_HOLDER_POS, _holderSO.HolderShowDuration)
-            .SetEase(_holderSO.HolderShowEase);
-
-        _rightBorders.DOMoveX(BORDERS_POS, _holderSO.HolderShowDuration).SetEase(_holderSO.HolderShowEase);
-        _leftBorders.DOMoveX(-BORDERS_POS, _holderSO.HolderShowDuration).SetEase(_holderSO.HolderShowEase)
-            .OnComplete(() => ShowSpikeHolder());
-    }
-
-    private void ShowSpikeHolder()
-    {
-        DOTween.Sequence().OnStart(() =>
-            {
-                _leftSpikesHolder.DOLocalMoveY(-LEFT_HOLDER_POS, _holderSO.SpikeShowDuration)
-                .SetEase(_holderSO.SpikeShowEase);
-
-                _rightSpikesHolder.DOLocalMoveY(LEFT_HOLDER_POS, _holderSO.SpikeShowDuration)
-                    .SetEase(_holderSO.SpikeShowEase);
-            })
-            .AppendInterval(1.0f)
-            .OnComplete(() => EventDispatcher.PostEvent(EventsID.SHOW_SQUARE));
+        MoveHolders(TOP_HOLDER_POS, _holderSO.HolderShowDuration, _holderSO.HolderShowEase);
+        MoveBorders(BORDERS_POS, _holderSO.HolderShowDuration, _holderSO.HolderShowEase,
+            () => ShowSpikeHolder());
     }
 
     private void HideHolder()
     {
         EventDispatcher.PostEvent(EventsID.HOLDER_SFX, _holderSO.GetSFXByName("Close"));
 
-        _topSpikesHolder.DOMoveY(TOP_HOLDER_OLD_POS, _holderSO.HolderHideDuration)
-            .SetEase(_holderSO.HolderHideEase);
-        _bottomSpikesHolder.DOMoveY(-TOP_HOLDER_OLD_POS, _holderSO.HolderHideDuration)
-            .SetEase(_holderSO.HolderHideEase);
+        MoveHolders(TOP_HOLDER_OLD_POS, _holderSO.HolderHideDuration, _holderSO.HolderHideEase);
+        MoveBorders(BORDERS_OLD_POS, _holderSO.HolderHideDuration, _holderSO.HolderHideEase,
+            () => HideSpikeHolder());
+    }
 
-        _rightBorders.DOMoveX(BORDERS_OLD_POS, _holderSO.HolderHideDuration).SetEase(_holderSO.HolderHideEase);
-        _leftBorders.DOMoveX(-BORDERS_OLD_POS, _holderSO.HolderHideDuration).SetEase(_holderSO.HolderHideEase)
-            .OnComplete(() => HideSpikeHolder());
+    private void MoveHolders(float yHolderPos, float duration, Ease ease)
+    {
+        _topSpikesHolder.DOMoveY(yHolderPos, duration).SetEase(ease);
+        _bottomSpikesHolder.DOMoveY(-yHolderPos, duration).SetEase(ease);
+    }
+
+    #endregion
+
+    #region Borders
+
+    private void MoveBorders(float xBorderPos, float duration, Ease ease, TweenCallback callBack)
+    {
+        _rightBorders.DOMoveX(xBorderPos, duration).SetEase(ease);
+        _leftBorders.DOMoveX(-xBorderPos, duration).SetEase(ease)
+            .OnComplete(() => callBack());
+    }
+
+    #endregion
+
+    #region Spike Holder
+    
+    private void ShowSpikeHolder()
+    {
+        MoveSpike(SPIKE_HOLDER_POS, _holderSO.SpikeShowDuration, 1.0f, _holderSO.SpikeShowEase,
+            () => EventDispatcher.PostEvent(EventsID.SHOW_SQUARE));
     }
 
     private void HideSpikeHolder()
     {
-        _leftSpikesHolder.DOLocalMoveY(-LEFT_HOLDER_OLD_POS, _holderSO.SpikeHideDuration);
-        _rightSpikesHolder.DOLocalMoveY(LEFT_HOLDER_OLD_POS, _holderSO.SpikeHideDuration)
-            .OnComplete(() => StateController.RaiseGameoverEvent());
+        MoveSpike(SPIKE_HOLDER_OLD_POS, _holderSO.SpikeShowDuration, 0.0f, Ease.Unset,
+            () => StateController.RaiseGameoverEvent());
     }
+
+    private void MoveSpike(float ySpikeHolderPos, float duration, float delay, Ease ease, TweenCallback callback)
+    {
+        DOTween.Sequence().OnStart(() =>
+        {
+            _leftSpikesHolder.DOLocalMoveY(-ySpikeHolderPos, duration).SetEase(ease);
+            _rightSpikesHolder.DOLocalMoveY(ySpikeHolderPos, duration).SetEase(ease);
+        })
+        .AppendInterval(delay)
+        .OnComplete(() => callback());
+    }
+
+    #endregion
 
     private void CacheEvents()
     {
-        _onTitleToGameplayRef = (param) => OnTitleToGameplay();
+        _showHolderRef = (param) => ShowHolder();
         _hideHolderRef = (param) => HideHolder();
     }
 }

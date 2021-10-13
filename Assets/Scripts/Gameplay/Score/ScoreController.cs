@@ -1,8 +1,9 @@
 using System;
+using UnityEngine;
 
-public class ScoreController : StateBase
+public class ScoreController : MonoBehaviour
 {
-    private Action<object> _onTitleRef, _collidedSquareRef;
+    private Action<object> _resetScoreRef, _collidedSquareRef;
 
 
     private int _totalScore;
@@ -16,20 +17,20 @@ public class ScoreController : StateBase
 
     private void OnEnable()
     {
-        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RegisterListener(EventsID.RESET_SCORE, _resetScoreRef);
         EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
     private void OnDisable()
     {
-        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
+        EventDispatcher.RemoveListener(EventsID.RESET_SCORE, _resetScoreRef);
         EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
 
-    public override void OnTitle()
+    public void ResetScore(object score)
     {
-        _totalScore = 0;
+        _totalScore = (int) score;
         _isStartJump = true;
     }
 
@@ -49,8 +50,7 @@ public class ScoreController : StateBase
 
     private void CacheEvents()
     {
-        _onTitleRef = (param) => OnTitle();
-
+        _resetScoreRef = (param) => ResetScore(param);
         _collidedSquareRef = (param) => UpdateScore();
     }
 }

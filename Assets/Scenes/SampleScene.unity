@@ -356,6 +356,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 370454485}
+  - component: {fileID: 370454487}
   - component: {fileID: 370454486}
   m_Layer: 1
   m_Name: ScoreManager
@@ -388,6 +389,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50506b62949542e4b9e7557c2156379d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &370454487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 370454484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad35ea57464f34c45a4aeb57ec481216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &478692338
@@ -2530,6 +2543,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2073496946}
+  - component: {fileID: 2073496948}
   - component: {fileID: 2073496947}
   m_Layer: 1
   m_Name: HolderManager
@@ -2572,6 +2586,18 @@ MonoBehaviour:
   _leftBorders: {fileID: 814114744}
   _rightBorders: {fileID: 617823947}
   _isFailedConfig: 0
+--- !u!114 &2073496948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073496945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbd0b6665c25df0419931de2eb0e9193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2086338838
 GameObject:
   m_ObjectHideFlags: 0

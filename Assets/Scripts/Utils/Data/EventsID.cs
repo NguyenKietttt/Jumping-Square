@@ -19,9 +19,11 @@ public enum EventsID
 
 	// Score
 	DISPLAY_SCORE,
+	RESET_SCORE,
 
 
 	// Holder
+	SHOW_HOLDER,
 	HIDE_HOLDER,
 
 	// Spike
