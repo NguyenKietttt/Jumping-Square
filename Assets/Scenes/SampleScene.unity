@@ -1150,7 +1150,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &792952500
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1281,14 +1281,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _panelSO: {fileID: 11400000, guid: ac2a5fa9a6753b24ca74310f9e79185c, type: 2}
   _buttonSO: {fileID: 11400000, guid: 5bb3eab9eb7a65349b086637140a40dc, type: 2}
-  _titleCanvas: {fileID: 2086338838}
+  _raycasterTitle: {fileID: 2086338840}
   _titlePanel: {fileID: 2014238455}
   _titleButtons:
   - {fileID: 574808051}
   - {fileID: 719555900}
-  _gameplayCanvas: {fileID: 792952499}
   _gameplayPanel: {fileID: 1509094586}
-  _gameoverCanvas: {fileID: 1596782471}
+  _raycasterGameover: {fileID: 1596782473}
   _gameoverPanel: {fileID: 1229434782}
   _gameoverButtons:
   - {fileID: 257355173}
@@ -1392,6 +1391,7 @@ GameObject:
   - component: {fileID: 1116309654}
   - component: {fileID: 1116309656}
   - component: {fileID: 1116309655}
+  - component: {fileID: 1116309657}
   m_Layer: 5
   m_Name: TitleText
   m_TagString: Untagged
@@ -1441,7 +1441,7 @@ MonoBehaviour:
   m_text: Jumping Square
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 712b61b99076f574e9fc8666e311c6ed, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 1303732322106945887, guid: 712b61b99076f574e9fc8666e311c6ed, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1504,7 +1504,7 @@ MonoBehaviour:
   m_margin: {x: -450.88477, y: 0, z: -457.14734, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1116309656
@@ -1515,6 +1515,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116309653}
   m_CullTransparentMesh: 1
+--- !u!114 &1116309657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116309653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bdca9468b4c4b44eb46ea9461d79184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1121792668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1762,7 +1774,7 @@ MonoBehaviour:
   m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 712b61b99076f574e9fc8666e311c6ed, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 1303732322106945887, guid: 712b61b99076f574e9fc8666e311c6ed, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1825,7 +1837,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1296879141
@@ -1896,7 +1908,7 @@ MonoBehaviour:
   m_text: Game Over
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 712b61b99076f574e9fc8666e311c6ed, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 1303732322106945887, guid: 712b61b99076f574e9fc8666e311c6ed, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1959,7 +1971,7 @@ MonoBehaviour:
   m_margin: {x: -450.88477, y: 0, z: -457.14734, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 1
+  m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1504277096
@@ -2069,7 +2081,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1596782472
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2616,7 +2628,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2086338839
 RectTransform:
   m_ObjectHideFlags: 0

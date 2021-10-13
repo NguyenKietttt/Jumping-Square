@@ -12,16 +12,15 @@ public class UIPanelController : StateBase
     [SerializeField] private ButtonSO _buttonSO;
 
     [Header("Title HUD")]
-    [SerializeField] private GameObject _titleCanvas;
+    [SerializeField] private GraphicRaycaster _raycasterTitle;
     [SerializeField] private RectTransform _titlePanel;
     [SerializeField] private List<Transform> _titleButtons;
 
     [Header("Gameplay HUD")]
-    [SerializeField] private GameObject _gameplayCanvas;
     [SerializeField] private RectTransform _gameplayPanel;
 
     [Header("Gameover HUD")]
-    [SerializeField] private GameObject _gameoverCanvas;
+    [SerializeField] private GraphicRaycaster _raycasterGameover;
     [SerializeField] private RectTransform _gameoverPanel;
     [SerializeField] private List<Transform> _gameoverButtons;
 
@@ -29,7 +28,6 @@ public class UIPanelController : StateBase
     [SerializeField] private bool _isFailedConfig;
 
     private Action<object> _onTitleRef, _onTitleToGameplayRef, _onGameplayRef, _onGameoverRef;
-    private GraphicRaycaster _raycasterTitle, _raycasterGameover;
     private bool _isFirstPlay;
 
 
@@ -38,18 +36,17 @@ public class UIPanelController : StateBase
         CustomLogs.Instance.Warning(_panelSO == null, "panelSO is missing!!!");
         CustomLogs.Instance.Warning(_buttonSO == null, "buttonSO is missing!!!");
 
-        CustomLogs.Instance.Warning(_titleCanvas == null, "titleCanvas is missing!!!");
+        CustomLogs.Instance.Warning(_raycasterTitle == null, "raycasterTitle is missing!!!");
         CustomLogs.Instance.Warning(_titlePanel == null, "titlePanel is missing!!!");
 
-        CustomLogs.Instance.Warning(_gameplayCanvas == null, "gameplayCanvas is missing!!!");
         CustomLogs.Instance.Warning(_gameplayPanel == null, "gameplayPanel is missing!!!");
 
-        CustomLogs.Instance.Warning(_gameoverCanvas == null, "gameoverCanvas is missing!!!");
+        CustomLogs.Instance.Warning(_raycasterGameover == null, "raycasterGameover is missing!!!");
         CustomLogs.Instance.Warning(_gameoverPanel == null, "gameoverPanel is missing!!!");
 
-        _isFailedConfig = _panelSO == null || _buttonSO == null || _titleCanvas == null
-            || _titlePanel == null || _gameplayCanvas == null || _gameplayPanel == null
-            || _gameoverCanvas == null || _gameoverPanel == null;
+        _isFailedConfig = _panelSO == null || _buttonSO == null || _raycasterTitle == null
+            || _titlePanel == null || _gameplayPanel == null || _raycasterGameover == null 
+            || _gameoverPanel == null;
     }
 
     private void Awake()
@@ -57,7 +54,6 @@ public class UIPanelController : StateBase
         if (_isFailedConfig)
             enabled = false;
 
-        CacheComponents();
         CacheEvents();
 
         _isFirstPlay = true;
@@ -91,13 +87,13 @@ public class UIPanelController : StateBase
         {
             DOTween.Sequence().AppendCallback(() =>
                 {
-                    HideHUD(_gameoverCanvas, _gameoverPanel, _gameoverButtons, _raycasterGameover,
+                    HideHUD(_gameoverPanel, _gameoverButtons, _raycasterGameover,
                         () => { });
                 })
                 .AppendInterval(1.2f)
                 .OnComplete(() =>
                 {
-                    ShowHUD(_titleCanvas, _titlePanel, _titleButtons,
+                    ShowHUD(_titlePanel, _titleButtons,
                         () => _raycasterTitle.enabled = true);
                 });
         }
@@ -105,7 +101,7 @@ public class UIPanelController : StateBase
         {
             _isFirstPlay = false;
 
-            ShowHUD(_titleCanvas, _titlePanel, _titleButtons,
+            ShowHUD(_titlePanel, _titleButtons,
                 () => _raycasterTitle.enabled = true);
         }
     }
@@ -122,7 +118,7 @@ public class UIPanelController : StateBase
             .AppendInterval(1.2f)
             .OnComplete(() =>
             {
-                ShowHUD(_gameoverCanvas, _gameoverPanel, _gameoverButtons,
+                ShowHUD(_gameoverPanel, _gameoverButtons,
                     () => _raycasterGameover.enabled = true);
             });
     }
@@ -130,16 +126,12 @@ public class UIPanelController : StateBase
 
     #region Title Panel & Gameover Panel
 
-    private void ShowHUD(GameObject canvas, RectTransform panel,
-        List<Transform> buttons, TweenCallback callback)
+    private void ShowHUD(RectTransform panel, List<Transform> buttons, TweenCallback callback)
     {
         EventDispatcher.PostEvent(EventsID.PANEL_SFX, _panelSO.GetSFXByName("Show"));
 
-        DOTween.Sequence().OnStart(() =>
-            {
-                canvas.SetActive(true);
-                panel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack);
-            })
+        DOTween.Sequence()
+            .OnStart(() =>panel.DOScale(Vector3.one, 1.0f).SetEase(Ease.OutBack))
             .AppendInterval(1.2f)
             .AppendCallback(() => StartCoroutine(ShowButtons(buttons)))
             .AppendInterval(0.5f)
@@ -151,11 +143,11 @@ public class UIPanelController : StateBase
     /// </summary>
     public void HideTitleHUD()
     {
-        HideHUD(_titleCanvas, _titlePanel, _titleButtons, _raycasterTitle,
+        HideHUD(_titlePanel, _titleButtons, _raycasterTitle,
             () => StateController.RaiseTitleToGameplayState());
     }
 
-    private void HideHUD(GameObject canvas, RectTransform panel, List<Transform> buttons,
+    private void HideHUD(RectTransform panel, List<Transform> buttons,
         GraphicRaycaster raycaster, TweenCallback callback)
     {
         DOTween.Sequence()
@@ -165,7 +157,6 @@ public class UIPanelController : StateBase
             .AppendInterval(0.5f)
             .AppendCallback(() => EventDispatcher.PostEvent(EventsID.PANEL_SFX, _panelSO.GetSFXByName("Hide")))
             .Append(panel.DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack))
-            .AppendCallback(() => canvas.SetActive(false))
             .OnComplete(() => callback());
     }
 
@@ -200,24 +191,17 @@ public class UIPanelController : StateBase
     private void ShowGameplayHUD()
     {
         DOTween.Sequence()
-            .OnStart(() => _gameplayCanvas.SetActive(true))
             .Append(_gameplayPanel.DOAnchorPos(Vector2.zero, 0.8f).SetEase(Ease.OutBack));
     }
 
     private void HideGameplayHUD()
     {
         DOTween.Sequence()
-            .Append(_gameplayPanel.DOAnchorPos(new Vector2(0.0f, 1000.0f), 0.8f).SetEase(Ease.InBack))
-            .OnComplete(() => _gameplayCanvas.SetActive(false));
+            .Append(_gameplayPanel.DOAnchorPos(new Vector2(0.0f, 1000.0f), 0.8f).SetEase(Ease.InBack));
     }
 
     #endregion
 
-    private void CacheComponents()
-    {
-        _raycasterTitle = _titleCanvas.GetComponent<GraphicRaycaster>();
-        _raycasterGameover = _gameoverCanvas.GetComponent<GraphicRaycaster>();
-    }
 
     private void CacheEvents()
     {
