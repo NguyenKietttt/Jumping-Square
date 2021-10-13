@@ -3,8 +3,11 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 
-public class SpikeController : StateBase
+public class SpikeMovement : MonoBehaviour
 {
+    private Action<object> _setSpikeToSpawnRef, _displayScoreRef, _collidedSquareRef, _hideSpikeRef;
+   
+   
     private readonly float OLD_SPIKE_POSITION = -4.5f;
     private readonly float NEW_SPIKE_POSITION = -3.5f;
 
@@ -12,14 +15,9 @@ public class SpikeController : StateBase
     [Header("Configs")]
     [SerializeField] private SpikeSO _spikeSO;
 
-    [Header("References")]
-    [SerializeField] private GameObject _leftSpikeHolder;
-    [SerializeField] private GameObject _rightSpikeHolder;
-
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private Action<object> _onTitleRef, _onGameplayToGameoverRef, _displayScoreRef, _collidedSquareRef;
     private List<Transform> _leftSpikes, _rightSpikes;
     private int _spikesPerLevel;
 
@@ -28,10 +26,7 @@ public class SpikeController : StateBase
     {
         CustomLogs.Instance.Warning(_spikeSO == null, "spikeSO is missing!!!");
 
-        CustomLogs.Instance.Warning(_leftSpikeHolder == null, "leftSpikeHolder is missing!!!");
-        CustomLogs.Instance.Warning(_rightSpikeHolder == null, "rightSpikeHolder is missing!!!");
-
-        _isFailedConfig = _spikeSO == null || _leftSpikeHolder == null || _rightSpikeHolder == null;
+        _isFailedConfig = _spikeSO == null;
     }
 
     private void Awake()
@@ -39,56 +34,49 @@ public class SpikeController : StateBase
         if (_isFailedConfig)
             enabled = false;
 
-        _leftSpikes = GetHolderChilds(_leftSpikeHolder);
-        _rightSpikes = GetHolderChilds(_rightSpikeHolder);
-
-        CacheEvents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
     {
-        EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
-        EventDispatcher.RegisterListener(EventsID.GAMEPLAY_TO_GAMEOVER_STATE, _onGameplayToGameoverRef);
-
+        EventDispatcher.RegisterListener(EventsID.GET_SPIKE_CHILD, (param) => GetSpikesChild(param));
+        EventDispatcher.RegisterListener(EventsID.SET_SPIKE_TO_SPAWN, _setSpikeToSpawnRef);
         EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
         EventDispatcher.RegisterListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
+        EventDispatcher.RegisterListener(EventsID.HIDE_SPIKE, _hideSpikeRef);
     }
 
     private void OnDisable()
     {
-        EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
-        EventDispatcher.RemoveListener(EventsID.GAMEPLAY_TO_GAMEOVER_STATE, _onGameplayToGameoverRef);
-
+        EventDispatcher.RemoveListener(EventsID.GET_SPIKE_CHILD, (param) => GetSpikesChild(param));
+        EventDispatcher.RemoveListener(EventsID.SET_SPIKE_TO_SPAWN, _setSpikeToSpawnRef);
         EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
         EventDispatcher.RemoveListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
+        EventDispatcher.RemoveListener(EventsID.HIDE_SPIKE, _hideSpikeRef);
     }
 
-
-    public override void OnTitle()
+    private void GetSpikesChild(object spikesChild)
     {
-        _spikesPerLevel = 1;
+        var castedSpikesChild = (List<List<Transform>>) spikesChild;
+
+        _leftSpikes = castedSpikesChild[0];
+        _rightSpikes = castedSpikesChild[1];
     }
 
-    public override void OnGameplayToGameover()
+    private void SetSpikeToSpawn(object numberSpike)
+    {
+        var castedNumberSpike = (int) numberSpike;
+
+        _spikesPerLevel = castedNumberSpike;
+    }
+
+    public void HideSpike()
     {
         DOTween.Sequence()
             .AppendCallback(() => ReturnSpike(_leftSpikes))
             .AppendCallback(() => ReturnSpike(_rightSpikes))
             .AppendInterval(1.3f)
             .OnComplete(() => EventDispatcher.PostEvent(EventsID.HIDE_HOLDER));
-    }
-
-
-    private List<Transform> GetHolderChilds(GameObject holder)
-    {
-        var childs = new List<Transform>();
-
-        for (int i = 0; i < holder.transform.childCount; i++)
-        {
-            childs.Add(holder.transform.GetChild(i).transform);
-        }
-
-        return childs;
     }
 
     private void SetSpikeSpawnedByScore(object score)
@@ -152,13 +140,11 @@ public class SpikeController : StateBase
         }
     }
 
-    private void CacheEvents()
+    private void CacheCallbacks()
     {
-        _onTitleRef = (param) => OnTitle();
-        _onGameplayToGameoverRef = (param) => OnGameplayToGameover();
-
+        _setSpikeToSpawnRef = (param) => SetSpikeToSpawn(param);
         _displayScoreRef = (param) => SetSpikeSpawnedByScore(param);
-
         _collidedSquareRef = (param) => MoveSelectedSpike(param);
+        _hideSpikeRef = (param) => HideSpike();
     }
 }

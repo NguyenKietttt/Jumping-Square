@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2968e5fd811b004d8ae1297e8715de5, type: 3}
   m_Name: SpikeData
   m_EditorClassIdentifier: 
+  spikeDict:
+  - name: Left
+    prefab: {fileID: 1267481574682130103, guid: f25dd159e1de8984ba4f9af4acafeee5, type: 3}
+  - name: Right
+    prefab: {fileID: 6050183342826834985, guid: c0f8c25e9bdc830488ef196273eb633b, type: 3}
   spawnDeday: 0.7
   sfxDict:
   - name: Spike
-    sfx: {fileID: 8300000, guid: 1befa63d294b15947992c53fe0675df1, type: 3}
+    clip: {fileID: 8300000, guid: 1befa63d294b15947992c53fe0675df1, type: 3}

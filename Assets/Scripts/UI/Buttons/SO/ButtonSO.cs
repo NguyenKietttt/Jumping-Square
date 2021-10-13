@@ -17,6 +17,6 @@ public class ButtonSO : ScriptableObject
 
     public AudioClip GetSFXByName(string sfxName)
     {
-        return SfxDict.Find(p => p.Name == sfxName).SFX;
+        return SfxDict.Find(p => p.Name == sfxName).Clip;
     }
 }

@@ -10,9 +10,7 @@ public class SquareSO : ScriptableObject
     [SerializeField] [Range(0.0f, 1.0f)] private float rotateDuration;
 
     [Header("VFX")]
-    [SerializeField] private GameObject collidedVFX;
-    [SerializeField] private GameObject jumpVFX;
-    [SerializeField] private GameObject explodeVFX;
+    [SerializeField] private List<GameobjectDict> vfxDict;
 
     [Header("SFX")]
     [SerializeField] private List<AudioDict> sfxDict;
@@ -24,9 +22,7 @@ public class SquareSO : ScriptableObject
     public float JumpLength => jumpLength;
     public float RotateDuration => rotateDuration;
     
-    public GameObject CollidedVFX => collidedVFX;
-    public GameObject JumpVFX => jumpVFX;
-    public GameObject ExplodeVFX => explodeVFX;
+    public List<GameobjectDict> VfxDict => vfxDict;
 
     public List<AudioDict> SfxDict => sfxDict;
 
@@ -35,6 +31,11 @@ public class SquareSO : ScriptableObject
 
     public AudioClip GetSFXByName(string sfxName)
     {
-        return SfxDict.Find(p => p.Name == sfxName).SFX;
+        return SfxDict.Find(p => p.Name == sfxName).Clip;
+    }
+
+    public GameObject GetVFXByName(string vfxName)
+    {
+        return vfxDict.Find(p => p.Name == vfxName).Prefab;
     }
 }

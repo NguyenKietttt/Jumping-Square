@@ -11,6 +11,9 @@ public class HolderController : StateBase
     private readonly float BORDERS_POS = 8.5f;
     private readonly float BORDERS_OLD_POS = 10.5f;
 
+    
+    private Action<object> _onTitleToGameplayRef, _hideHolderRef;
+
 
     [Header("Configs")]
     [SerializeField] private HolderSO _holderSO;
@@ -28,7 +31,6 @@ public class HolderController : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private Action<object> _onTitleToGameplayRef, _hideHolderRef;
 
     private void OnValidate()
     {
@@ -85,10 +87,10 @@ public class HolderController : StateBase
 
         _rightBorders.DOMoveX(BORDERS_POS, _holderSO.HolderShowDuration).SetEase(_holderSO.HolderShowEase);
         _leftBorders.DOMoveX(-BORDERS_POS, _holderSO.HolderShowDuration).SetEase(_holderSO.HolderShowEase)
-            .OnComplete(() => ShowSpikes());
+            .OnComplete(() => ShowSpikeHolder());
     }
 
-    private void ShowSpikes()
+    private void ShowSpikeHolder()
     {
         DOTween.Sequence().OnStart(() =>
             {
@@ -113,10 +115,10 @@ public class HolderController : StateBase
 
         _rightBorders.DOMoveX(BORDERS_OLD_POS, _holderSO.HolderHideDuration).SetEase(_holderSO.HolderHideEase);
         _leftBorders.DOMoveX(-BORDERS_OLD_POS, _holderSO.HolderHideDuration).SetEase(_holderSO.HolderHideEase)
-            .OnComplete(() => HideSpikes());
+            .OnComplete(() => HideSpikeHolder());
     }
 
-    private void HideSpikes()
+    private void HideSpikeHolder()
     {
         _leftSpikesHolder.DOLocalMoveY(-LEFT_HOLDER_OLD_POS, _holderSO.SpikeHideDuration);
         _rightSpikesHolder.DOLocalMoveY(LEFT_HOLDER_OLD_POS, _holderSO.SpikeHideDuration)

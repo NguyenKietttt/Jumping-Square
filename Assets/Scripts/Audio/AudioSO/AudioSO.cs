@@ -17,6 +17,6 @@ public class AudioSO : ScriptableObject
 
     public AudioClip GetTrackByName(string track)
     {
-        return MusicDict.Find(p => p.Name == track).SFX;
+        return MusicDict.Find(p => p.Name == track).Clip;
     }
 }

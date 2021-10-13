@@ -34,7 +34,7 @@ public class SquareVFX : MonoBehaviour
             enabled = false;
 
         CacheComponents();
-        CacheEvents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
@@ -57,9 +57,11 @@ public class SquareVFX : MonoBehaviour
         var boolIsFacingLeft = (bool)isFacingLeft;
 
         if (boolIsFacingLeft)
-            Instantiate(_squareSO.JumpVFX, _transform.position + VFX_JUMP_LEFT_OFFSET, Quaternion.identity);
+            Instantiate(_squareSO.GetVFXByName("Jump"), 
+                _transform.position + VFX_JUMP_LEFT_OFFSET, Quaternion.identity);
         else
-            Instantiate(_squareSO.JumpVFX, _transform.position + VFX_JUMP_RIGHT_OFFSET, Quaternion.identity);
+            Instantiate(_squareSO.GetVFXByName("Jump"), 
+                _transform.position + VFX_JUMP_RIGHT_OFFSET, Quaternion.identity);
     }
 
     private void SpawnCollidedVFX(object isFacingLeft)
@@ -67,14 +69,14 @@ public class SquareVFX : MonoBehaviour
         var boolIsFacingLeft = (bool)isFacingLeft;
 
         if (boolIsFacingLeft)
-            Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, Quaternion.identity);
+            Instantiate(_squareSO.GetVFXByName("Collided"), _renderer.bounds.center, Quaternion.identity);
         else
-            Instantiate(_squareSO.CollidedVFX, _renderer.bounds.center, INVERT_ROTATION);
+            Instantiate(_squareSO.GetVFXByName("Collided"), _renderer.bounds.center, INVERT_ROTATION);
     }
 
     private void SpawnDeadVFX()
     {
-        Instantiate(_squareSO.ExplodeVFX, transform.position, Quaternion.identity);
+        Instantiate(_squareSO.GetVFXByName("Explode"), transform.position, Quaternion.identity);
     }
 
     private void CacheComponents()
@@ -83,7 +85,7 @@ public class SquareVFX : MonoBehaviour
         _renderer = GetComponent<Renderer>();
     }
 
-    private void CacheEvents()
+    private void CacheCallbacks()
     {
         _jumpVFXRef = (param) => SpawnJumpVFX(param);
         _collidedVFXRef = (param) => SpawnCollidedVFX(param);

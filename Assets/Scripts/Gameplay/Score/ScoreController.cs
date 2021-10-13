@@ -3,6 +3,8 @@ using System;
 public class ScoreController : StateBase
 {
     private Action<object> _onTitleRef, _collidedSquareRef;
+
+
     private int _totalScore;
     private bool _isStartJump;
 
@@ -11,17 +13,16 @@ public class ScoreController : StateBase
     {
         CacheEvents();
     }
+
     private void OnEnable()
     {
         EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
-
         EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
     private void OnDisable()
     {
         EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
-
         EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 

@@ -50,7 +50,7 @@ public class SquareTrigger : MonoBehaviour
     {
         DOTween.Sequence()
             .AppendCallback(() => Time.timeScale = 0.5f)
-            .AppendInterval(0.5f)
+            .AppendInterval(1.0f)
             .AppendCallback(() => Time.timeScale = 1.0f);
     }
 }

@@ -36,7 +36,7 @@ public class UIScore : StateBase
             enabled = false;
 
         CacheComponents();
-        CacheEvents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
@@ -93,7 +93,7 @@ public class UIScore : StateBase
         _scoreTextRect = _score.GetComponent<RectTransform>();
     }
 
-    private void CacheEvents()
+    private void CacheCallbacks()
     {
         _onTitleRef = (param) => OnTitle();
 

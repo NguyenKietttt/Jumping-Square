@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class SquareState : StateBase
 {
     private Action<object> _onTitleRef, _onTitleToGameplayRef, _onGameplayRef, _onGameplayToGameoverRef;
@@ -14,7 +15,7 @@ public class SquareState : StateBase
     private void Awake()
     {
         CacheComponents();
-        CacheEvents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
@@ -66,7 +67,7 @@ public class SquareState : StateBase
         _squareRb = GetComponent<Rigidbody2D>();
     }
 
-    private void CacheEvents()
+    private void CacheCallbacks()
     {
         _onTitleRef = (param) => OnTitle();
         _onTitleToGameplayRef = (param) => OnTitleToGameplay();

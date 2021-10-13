@@ -32,7 +32,7 @@ public class SquareCollision : MonoBehaviour
             enabled = false;
 
         CacheComponents();
-        CacheEvents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
@@ -49,14 +49,13 @@ public class SquareCollision : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Border"))
         {
-            EventDispatcher.PostEvent(EventsID.SQUARE_COLLIDE_SFX, _squareSO.GetSFXByName("Impact"));
-
             _isCollided = !_isCollided;
 
+            EventDispatcher.PostEvent(EventsID.SQUARE_COLLIDE_SFX, _squareSO.GetSFXByName("Impact"));
             EventDispatcher.PostEvent(EventsID.COLLIDED_SQUARE, _isCollided);
             EventDispatcher.PostEvent(EventsID.SQUARE_COLLIDED_VFX, _isCollided);
             
-            CheckDoubleJump();
+            CheckDoubleCollided();
         }
     }
 
@@ -67,7 +66,7 @@ public class SquareCollision : MonoBehaviour
         EventDispatcher.PostEvent(EventsID.COLLIDED_SQUARE, _isCollided);
     }
 
-    private void CheckDoubleJump()
+    private void CheckDoubleCollided()
     {
         DOTween.Sequence()
             .AppendCallback(() => _boxCollider2D.enabled = false)
@@ -86,7 +85,7 @@ public class SquareCollision : MonoBehaviour
         _boxCollider2D = GetComponent<BoxCollider2D>();
     }
 
-    private void CacheEvents()
+    private void CacheCallbacks()
     {
         _setFirstCollided = (param) => SetFirstCollided();
     }

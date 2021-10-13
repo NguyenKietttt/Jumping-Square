@@ -18,12 +18,16 @@ public enum EventsID
 
 
 	// Score
-	UPDATE_SCORE,
 	DISPLAY_SCORE,
 
 
 	// Holder
 	HIDE_HOLDER,
+
+	// Spike
+	GET_SPIKE_CHILD,
+	SET_SPIKE_TO_SPAWN,
+	HIDE_SPIKE,
 
 
 	// VFX

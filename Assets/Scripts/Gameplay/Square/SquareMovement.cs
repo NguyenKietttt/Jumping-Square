@@ -10,8 +10,7 @@ public class SquareMovement : MonoBehaviour
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
 
 
-    private Action<object> _showSquareRef, _hideSquareRef, _collidedSquareRef, _setAllowJumpRef, 
-        _setFirstJumpRef;
+    private Action<object> _showSquareRef, _hideSquareRef, _collidedSquareRef, _setAllowJumpRef, _setFirstJumpRef;
 
 
     [Header("Configs")]
@@ -20,7 +19,7 @@ public class SquareMovement : MonoBehaviour
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private bool _isAllowJump, _isFirstJump, _isCollided;
+    private bool _isAllowJump, _isFirstJump, _isFacingLeft;
     private Rigidbody2D _squareRb;
     private Transform _transform;
 
@@ -34,12 +33,11 @@ public class SquareMovement : MonoBehaviour
 
     private void Awake()
     {
-
         if (_isFailedConfig)
             enabled = false;
 
         CacheComponents();
-        CacheEvents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
@@ -68,62 +66,39 @@ public class SquareMovement : MonoBehaviour
     /// <summary>
     /// Raise by InputManager in Hierarchy
     /// </summary>
-    public void Jump(InputAction.CallbackContext ctx)
+    public void ClickToJump(InputAction.CallbackContext ctx)
     {
-        if (_isFailedConfig)
-            return;
-
-        if (!_isAllowJump)
+        if (_isFailedConfig || !_isAllowJump)
             return;
 
         if (_isFirstJump)
         {
-            StateController.RaiseGameplayEvent();
             _isFirstJump = false;
+            StateController.RaiseGameplayEvent();
 
-            EventDispatcher.PostEvent(EventsID.SQUARE_MOVEMENT_SFX, _squareSO.GetSFXByName("Jump"));
             return;
         }
 
         if (ctx.started)
-        {
-            EventDispatcher.PostEvent(EventsID.SQUARE_MOVEMENT_SFX, _squareSO.GetSFXByName("Jump"));
-
-            // Jump to an exact height
-            var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
-                * (Physics2D.gravity.y * _squareRb.gravityScale));
-
-            _squareRb.velocity = Vector2.zero;
-
-            if (_isCollided)
-            {
-                _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
-                Rotate360(ROTATE_VECTOR);
-            }
-            else
-            {
-                _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
-                Rotate360(-ROTATE_VECTOR);
-            }
-
-            EventDispatcher.PostEvent(EventsID.SQUARE_JUMP_VFX, _isCollided);
-        }
+            Jump();
     }
 
-    private void Jump(object isCollided)
+    private void JumpWhenCollided(object isFacingLeft)
     {
-        if (_isFailedConfig)
-            return;
+        _isFacingLeft = (bool)isFacingLeft;
 
-        _isCollided = (bool)isCollided;
+        Jump();
+    }
 
+    private void Jump()
+    {
         // Jump to an exact height
         var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2.0f
             * (Physics2D.gravity.y * _squareRb.gravityScale));
 
         _squareRb.velocity = Vector2.zero;
 
-        if (_isCollided)
+        if (_isFacingLeft)
         {
             _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
             Rotate360(ROTATE_VECTOR);
@@ -133,6 +108,9 @@ public class SquareMovement : MonoBehaviour
             _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
             Rotate360(-ROTATE_VECTOR);
         }
+
+        EventDispatcher.PostEvent(EventsID.SQUARE_MOVEMENT_SFX, _squareSO.GetSFXByName("Jump"));
+        EventDispatcher.PostEvent(EventsID.SQUARE_JUMP_VFX, _isFacingLeft);
     }
 
     private void SetAllowJump(object condition)
@@ -185,7 +163,7 @@ public class SquareMovement : MonoBehaviour
         _squareRb = GetComponent<Rigidbody2D>();
     }
 
-    private void CacheEvents()
+    private void CacheCallbacks()
     {
         _showSquareRef = (param) => ShowSquare();
         _hideSquareRef = (param) => HideSquare();
@@ -193,6 +171,6 @@ public class SquareMovement : MonoBehaviour
         _setAllowJumpRef = (param) => SetAllowJump(param);
         _setFirstJumpRef = (param) => SetFirstJump(param);
 
-        _collidedSquareRef = (param) => Jump(param);
+        _collidedSquareRef = (param) => JumpWhenCollided(param);
     }
 }
