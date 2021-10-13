@@ -14,8 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxDict:
   - name: Show
-    sfx: {fileID: 8300000, guid: 83e839e668e518848a97d48db15f5474, type: 3}
+    clip: {fileID: 8300000, guid: cf941961756cc8a46a471540574c270a, type: 3}
   - name: Hide
-    sfx: {fileID: 8300000, guid: cf941961756cc8a46a471540574c270a, type: 3}
-  - name: GameOver_Show
-    sfx: {fileID: 8300000, guid: 2093bab7c648c3f498455c1bf91e4358, type: 3}
+    clip: {fileID: 8300000, guid: 83e839e668e518848a97d48db15f5474, type: 3}

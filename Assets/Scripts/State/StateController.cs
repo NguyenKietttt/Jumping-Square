@@ -3,22 +3,16 @@ using UnityEngine;
 
 public class StateController : MonoBehaviour
 {
-    public static event Action OnTitleEvent;
-    public static event Action OnTitleToGameplayEvent;
-    public static event Action OnGameplayEvent;
-    public static event Action OnGameplayToGameoverEvent;
-    public static event Action OnGameoverEvent;
-
     /// <summary>
     /// Raise by RestartButton in Hierarchy
     /// </summary>
-    public static void RaiseTitleEvent() => OnTitleEvent?.Invoke();
+    public static void RaiseTitleState() => EventDispatcher.PostEvent(EventsID.TITLE_STATE);
 
-    public static void RaiseTitleToGameplayEvent() => OnTitleToGameplayEvent?.Invoke();
+    public static void RaiseTitleToGameplayState() => EventDispatcher.PostEvent(EventsID.TITLE_TO_GAMEPLAY_STATE);
 
-    public static void RaiseGameplayEvent() => OnGameplayEvent?.Invoke();
+    public static void RaiseGameplayEvent() => EventDispatcher.PostEvent(EventsID.GAMEPLAY_STATE);
 
-    public static void RaiseOnGameplayToGameoverEvent() => OnGameplayToGameoverEvent?.Invoke();
+    public static void RaiseOnGameplayToGameoverEvent() => EventDispatcher.PostEvent(EventsID.GAMEPLAY_TO_GAMEOVER_STATE);
 
-    public static void RaiseGameoverEvent() => OnGameoverEvent?.Invoke();
+    public static void RaiseGameoverEvent() => EventDispatcher.PostEvent(EventsID.GAMEOVER_STATE);
 }

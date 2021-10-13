@@ -1,16 +1,14 @@
-using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Image))]
 public class SoundButton : MonoBehaviour, IButtonAction
 {
     private readonly float Duration = 0.3f;
     private readonly Vector3 VECTOR_90 = new Vector3(0, 90.0f, 0);
 
-
-    public static event Action<AudioClip> soundButtonSFXEvent;
 
     [Header("Configs")]
     [SerializeField] private ButtonSO _buttonSO;
@@ -38,8 +36,7 @@ public class SoundButton : MonoBehaviour, IButtonAction
         if (_isFailedConfig)
             enabled = false;
 
-        _rectTransform = GetComponent<RectTransform>();
-        _imageSrc = GetComponent<Image>();
+        CacheComponents();
 
         _isSoundOn = true;
     }
@@ -57,7 +54,7 @@ public class SoundButton : MonoBehaviour, IButtonAction
 
     public void OnClick()
     {
-        soundButtonSFXEvent?.Invoke(_buttonSO.GetSFXByName("Click"));
+        EventDispatcher.PostEvent(EventsID.BUTTON_SOUND_SFX, _buttonSO.GetSFXByName("Click"));
 
         DOTween.Sequence()
             .OnStart(() => _raycasterTitle.enabled = false)
@@ -80,5 +77,11 @@ public class SoundButton : MonoBehaviour, IButtonAction
 
 
         _isSoundOn = !_isSoundOn;
+    }
+
+    private void CacheComponents()
+    {
+        _rectTransform = GetComponent<RectTransform>();
+        _imageSrc = GetComponent<Image>();
     }
 }

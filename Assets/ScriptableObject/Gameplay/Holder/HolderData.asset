@@ -21,6 +21,6 @@ MonoBehaviour:
   spikeHideDuration: 0
   sfxDict:
   - name: Open
-    sfx: {fileID: 8300000, guid: 4ad3f79f86c360345b2638a3f8ec9e5f, type: 3}
+    clip: {fileID: 8300000, guid: 4ad3f79f86c360345b2638a3f8ec9e5f, type: 3}
   - name: Close
-    sfx: {fileID: 8300000, guid: 372da34c4554e4b4ab1be5b70b60f671, type: 3}
+    clip: {fileID: 8300000, guid: 372da34c4554e4b4ab1be5b70b60f671, type: 3}

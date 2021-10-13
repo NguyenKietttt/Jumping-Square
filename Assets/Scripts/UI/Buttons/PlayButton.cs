@@ -1,13 +1,9 @@
-using System;
 using DG.Tweening;
 using UnityEngine;
 
 public class PlayButton : MonoBehaviour, IButtonAction
 {
     private readonly float Duration = 0.3f;
-
-
-    public static event Action<AudioClip> playButtonSFXEvent;
 
 
     [Header("Configs")]
@@ -47,8 +43,8 @@ public class PlayButton : MonoBehaviour, IButtonAction
 
     public void OnClick()
     {
-        playButtonSFXEvent?.Invoke(_buttonSO.GetSFXByName("Click"));
-
+        EventDispatcher.PostEvent(EventsID.BUTTON_PLAY_SFX, _buttonSO.GetSFXByName("Click"));
+        
         _rectTransform.DOScale(Vector3.one * 2.0f, Duration).SetEase(Ease.OutCirc);
     }
 }

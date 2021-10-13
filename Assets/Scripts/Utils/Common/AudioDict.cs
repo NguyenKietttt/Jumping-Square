@@ -4,13 +4,13 @@ using UnityEngine;
 public struct AudioDict
 {
     [SerializeField] private string name;
-    [SerializeField] private AudioClip sfx;
+    [SerializeField] private AudioClip clip;
 
 
     #region Properties
 
     public string Name => name;
-    public AudioClip SFX => sfx;
+    public AudioClip Clip => clip;
 
     #endregion
 }

@@ -1,10 +1,14 @@
+using System;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
-public class UIScore : StateBase
+public class UIScoreController : MonoBehaviour
 {
     private readonly Vector3 VECTOR_90 = new Vector3(0, 90.0f, 0);
+    
+    
+    private Action<object> _resetScoreRef, _displayScoreRef;
 
 
     [Header("Configs")]
@@ -34,39 +38,42 @@ public class UIScore : StateBase
             enabled = false;
 
         CacheComponents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
+        EventDispatcher.RegisterListener(EventsID.RESET_SCORE, _resetScoreRef);
 
-        ScoreController.displayScoreEvent += param => DisplayScore(param);
+        EventDispatcher.RegisterListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
+        EventDispatcher.RemoveListener(EventsID.RESET_SCORE, _resetScoreRef);
 
-        ScoreController.displayScoreEvent -= param => DisplayScore(param);
+        EventDispatcher.RemoveListener(EventsID.DISPLAY_SCORE, _displayScoreRef);
     }
 
 
-    public override void OnTitleMenu()
+    public void ResetScore()
     {
         _scoreText.text = "0";
         _scoreText.color = _scoreSO.NormalScore;
     }
 
 
-    private void DisplayScore(int score)
+    private void DisplayScore(object score)
     {
+        var intScore = (int)score;
+        
         DOTween.Sequence()
             .Append(_scoreTextRect.DORotate(_scoreTextRect.eulerAngles + Vector3.up * 90.0f, _scoreSO.RotateTime))
             .AppendCallback(() =>
             {
                 _scoreText.text = score.ToString();
 
-                ChangeTextColor(score);
+                ChangeTextColor(intScore);
             })
             .OnComplete(() =>
             {
@@ -86,5 +93,12 @@ public class UIScore : StateBase
     {
         _scoreText = _score.GetComponent<TextMeshProUGUI>();
         _scoreTextRect = _score.GetComponent<RectTransform>();
+    }
+
+    private void CacheCallbacks()
+    {
+        _resetScoreRef = (param) => ResetScore();
+
+        _displayScoreRef = (param) => DisplayScore(param);
     }
 }
