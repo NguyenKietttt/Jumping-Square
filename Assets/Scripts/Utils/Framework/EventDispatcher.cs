@@ -7,8 +7,6 @@ public class EventDispatcher : MonoBehaviour
     private static Dictionary<EventsID, Action<object>> _listeners = new Dictionary<EventsID, Action<object>>();
 
 
-    #region Add Listeners, Post events, Remove listener
-
     /// <summary>
     /// Register to listen for eventID
     /// </summary>
@@ -64,5 +62,4 @@ public class EventDispatcher : MonoBehaviour
             _listeners[eventID] -= callback;
         }
     }
-    #endregion
 }

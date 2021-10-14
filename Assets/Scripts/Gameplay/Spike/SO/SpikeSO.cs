@@ -22,6 +22,6 @@ public class SpikeSO : ScriptableObject
 
     public AudioClip GetSFXByName(string sfxName)
     {
-        return SfxDict.Find(p => p.Name == sfxName).Clip;
+        return SfxDict.Find(p => p.Name.Equals(sfxName)).Clip;
     }
 }

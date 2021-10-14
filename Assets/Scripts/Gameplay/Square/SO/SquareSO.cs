@@ -31,11 +31,11 @@ public class SquareSO : ScriptableObject
 
     public AudioClip GetSFXByName(string sfxName)
     {
-        return SfxDict.Find(p => p.Name == sfxName).Clip;
+        return SfxDict.Find(p => p.Name.Equals(sfxName)).Clip;
     }
 
     public GameObject GetVFXByName(string vfxName)
     {
-        return vfxDict.Find(p => p.Name == vfxName).Prefab;
+        return vfxDict.Find(p => p.Name.Equals(vfxName)).Prefab;
     }
 }

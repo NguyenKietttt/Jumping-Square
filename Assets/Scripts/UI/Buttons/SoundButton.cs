@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,11 +12,13 @@ public class SoundButton : MonoBehaviour, IButtonAction
     [Header("Configs")]
     [SerializeField] private ButtonSO _buttonSO;
 
+    [Header("References")]
+    [SerializeField] private Sprite[] _soundBtnSprites;
+    [SerializeField] private GraphicRaycaster _raycasterTitle;
+
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    [SerializeField] private List<Sprite> _soundBtnSprites;
-    [SerializeField] private GraphicRaycaster _raycasterTitle;
 
     private RectTransform _rectTransform;
     private Image _imageSrc;
@@ -74,7 +75,6 @@ public class SoundButton : MonoBehaviour, IButtonAction
             _imageSrc.sprite = _soundBtnSprites[1];
         else
             _imageSrc.sprite = _soundBtnSprites[0];
-
 
         _isSoundOn = !_isSoundOn;
     }

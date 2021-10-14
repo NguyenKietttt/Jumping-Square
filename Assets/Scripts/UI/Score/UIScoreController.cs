@@ -58,6 +58,8 @@ public class UIScoreController : MonoBehaviour
 
     public void ResetScore()
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.RESET_SCORE + "</color>");
+        
         _scoreText.text = "0";
         _scoreText.color = _scoreSO.NormalScore;
     }

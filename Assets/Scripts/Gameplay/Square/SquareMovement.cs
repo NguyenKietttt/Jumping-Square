@@ -115,6 +115,8 @@ public class SquareMovement : MonoBehaviour
 
     private void SetAllowJump(object condition)
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.ALLOW_JUMP_SQUARE + "</color>");
+
         _isAllowJump = (bool)condition;
     }
 
