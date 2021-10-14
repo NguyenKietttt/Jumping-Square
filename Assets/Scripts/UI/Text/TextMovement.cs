@@ -34,6 +34,8 @@ public class TextMovement : StateBase
 
     public override void OnTitle()
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.TITLE_STATE + "</color>");
+
         _rectTransform.DOScale(Vector3.one * 1.2f, 1.0f).SetEase(Ease.OutCirc).SetLoops(-1, LoopType.Yoyo);
     }
 

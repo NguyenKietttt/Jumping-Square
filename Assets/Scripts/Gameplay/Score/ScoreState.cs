@@ -10,12 +10,12 @@ public class ScoreState : StateBase
         CacheEvents();
     }
 
-    private void OnEnable() 
+    private void OnEnable()
     {
         EventDispatcher.RegisterListener(EventsID.TITLE_STATE, _onTitleRef);
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
         EventDispatcher.RemoveListener(EventsID.TITLE_STATE, _onTitleRef);
     }
@@ -23,6 +23,9 @@ public class ScoreState : StateBase
 
     public override void OnTitle()
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.TITLE_STATE + "</color>");
+        CustomLogs.Instance.Log("<color=green> Start " + EventsID.RESET_SCORE + "</color>");
+
         EventDispatcher.PostEvent(EventsID.RESET_SCORE, 0);
     }
 

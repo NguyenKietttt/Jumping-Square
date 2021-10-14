@@ -37,6 +37,9 @@ public class SquareState : StateBase
 
     public override void OnTitle()
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.TITLE_STATE + "</color>");
+        CustomLogs.Instance.Log("<color=green> Start " + EventsID.ALLOW_JUMP_SQUARE + "</color>");
+        
         _isAllowJump = false;
         EventDispatcher.PostEvent(EventsID.ALLOW_JUMP_SQUARE, _isAllowJump);
 

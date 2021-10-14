@@ -83,6 +83,8 @@ public class UIPanelController : StateBase
 
     public override void OnTitle()
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.TITLE_STATE + "</color>");
+
         if (!_isFirstPlay)
         {
             DOTween.Sequence().AppendCallback(() =>

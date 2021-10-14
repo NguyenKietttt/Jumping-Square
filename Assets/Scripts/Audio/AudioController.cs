@@ -64,9 +64,9 @@ public class AudioController : MonoBehaviour
     public void ToggleAudio()
     {
         if (_isToggle)
-            _musicSource.volume = 0;
+            _musicSource.Stop();
         else
-            _musicSource.volume = 1;
+            _musicSource.Play();
 
         _isToggle = !_isToggle;
     }

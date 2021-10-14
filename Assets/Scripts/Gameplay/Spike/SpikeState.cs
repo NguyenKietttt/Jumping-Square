@@ -49,6 +49,8 @@ public class SpikeState : StateBase
 
     public override void OnTitle()
     {
+        CustomLogs.Instance.Log("<color=green> Listen  " + EventsID.TITLE_STATE + "</color>");
+
         if (_leftSpikes == null && _rightSpikes == null)
         {
             _leftSpikes = GetHolderChilds(_leftSpikeHolder);
@@ -59,8 +61,12 @@ public class SpikeState : StateBase
                 _leftSpikes, _rightSpikes
             };
 
+            CustomLogs.Instance.Log("<color=green> Start " + EventsID.GET_SPIKE_CHILD + "</color>");
+
             EventDispatcher.PostEvent(EventsID.GET_SPIKE_CHILD, spikesChild);
         }
+
+        CustomLogs.Instance.Log("<color=green> Start " + EventsID.SET_SPIKE_TO_SPAWN + "</color>");
 
         EventDispatcher.PostEvent(EventsID.SET_SPIKE_TO_SPAWN, 1);
     }

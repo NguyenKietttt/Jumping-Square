@@ -30,6 +30,8 @@ public class ScoreController : MonoBehaviour
 
     public void ResetScore(object score)
     {
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.RESET_SCORE + "</color>");
+
         _totalScore = (int) score;
         _isStartJump = true;
     }
@@ -43,7 +45,9 @@ public class ScoreController : MonoBehaviour
             return;
         }
 
-        _totalScore++;
+        if (_totalScore <= 99)
+            _totalScore++;
+        
 
         EventDispatcher.PostEvent(EventsID.DISPLAY_SCORE, _totalScore);
     }
