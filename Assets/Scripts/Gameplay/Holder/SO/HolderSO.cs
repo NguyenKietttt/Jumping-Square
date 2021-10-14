@@ -1,26 +1,30 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Holder Data", menuName = "SciptableObject/Gameplay/Holder Data")]
 public class HolderSO : ScriptableObject
 {
-    [Header("Hide")]
+    [Header("Show")]
     [SerializeField] private float holderShowDuration;
     [SerializeField] private Ease holderShowEase;
 
     [Space(15.0f)]
-    
+
     [SerializeField] private float spikeShowDuration;
     [SerializeField] private Ease spikeShowEase;
-    
-    [Header("Show")]
+
+    [Header("Hide")]
     [SerializeField] private float holderHideDuration;
     [SerializeField] private Ease holderHideEase;
-    
+
     [Space(15.0f)]
 
     [SerializeField] private float spikeHideDuration;
 
+    [Header("SFX")]
+    [SerializeField] private List<AudioDict> sfxDict;
+    
 
     #region Properties
 
@@ -33,5 +37,13 @@ public class HolderSO : ScriptableObject
     public Ease SpikeShowEase => spikeShowEase;
     public float SpikeHideDuration => spikeHideDuration;
 
+    public List<AudioDict> SfxDict => sfxDict;
+
     #endregion
+
+
+    public AudioClip GetSFXByName(string sfxName)
+    {
+        return SfxDict.Find(p => p.Name.Equals(sfxName)).Clip;
+    }
 }

@@ -1,12 +1,16 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using DG.Tweening;
+using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class SquareMovement : StateBase
+public class SquareMovement : MonoBehaviour
 {
     private readonly Vector3 ROTATE_VECTOR = new Vector3(0, 0, 360.0f);
+
+
+    private Action<object> _showSquareRef, _hideSquareRef, _collidedSquareRef, _setAllowJumpRef, _setFirstJumpRef;
 
 
     [Header("Configs")]
@@ -15,10 +19,9 @@ public class SquareMovement : StateBase
     [Header("Validation")]
     [SerializeField] private bool _isFailedConfig;
 
-    private bool _isAllowJump, _isFirstJump, _isCollided;
+    private bool _isAllowJump, _isFirstJump, _isFacingLeft;
     private Rigidbody2D _squareRb;
-    private SpriteRenderer _spriteRenderer;
-    private Transform _cacheTransform;
+    private Transform _transform;
 
 
     private void OnValidate()
@@ -30,132 +33,72 @@ public class SquareMovement : StateBase
 
     private void Awake()
     {
-        CacheComponents();
-
         if (_isFailedConfig)
             enabled = false;
+
+        CacheComponents();
+        CacheCallbacks();
     }
 
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
-        StateController.OnTitleToGameplayEvent += OnTitleToGameplay;
-        StateController.OnGameplayEvent += OnGameplay;
-        StateController.OnGameplayToGameoverEvent += OnGameplayToGameover;
+        EventDispatcher.RegisterListener(EventsID.SHOW_SQUARE, _showSquareRef);
+        EventDispatcher.RegisterListener(EventsID.HIDE_SQUARE, _hideSquareRef);
 
-        HolderController.endTitleToGameplayEvent += SetAllowJump;
+        EventDispatcher.RegisterListener(EventsID.ALLOW_JUMP_SQUARE, _setAllowJumpRef);
+        EventDispatcher.RegisterListener(EventsID.FIRST_JUMP_SQUARE, _setFirstJumpRef);
 
-        SquareCollision.OnBorderCollideEvent += param =>
-        {
-            Jump(param);
-        };
+        EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
-        StateController.OnTitleToGameplayEvent -= OnTitleToGameplay;
-        StateController.OnGameplayEvent -= OnGameplay;
-        StateController.OnGameplayToGameoverEvent -= OnGameplayToGameover;
+        EventDispatcher.RemoveListener(EventsID.SHOW_SQUARE, _showSquareRef);
+        EventDispatcher.RemoveListener(EventsID.HIDE_SQUARE, _hideSquareRef);
 
-        HolderController.endTitleToGameplayEvent -= SetAllowJump;
+        EventDispatcher.RemoveListener(EventsID.ALLOW_JUMP_SQUARE, _setAllowJumpRef);
+        EventDispatcher.RemoveListener(EventsID.FIRST_JUMP_SQUARE, _setFirstJumpRef);
 
-        SquareCollision.OnBorderCollideEvent -= param =>
-        {
-            Jump(param);
-        };
-    }
-
-
-    public override void OnTitleMenu()
-    {
-        _isAllowJump = false;
-
-        _spriteRenderer.enabled = false;
-        _squareRb.bodyType = RigidbodyType2D.Kinematic;
-    }
-
-    public override void OnTitleToGameplay()
-    {
-        _spriteRenderer.enabled = true;
-
-        _isFirstJump = true;
-    }
-
-    public override void OnGameplay()
-    {
-        _squareRb.bodyType = RigidbodyType2D.Dynamic;
-        
-        Jump(_isCollided);
-    }
-
-    public override void OnGameplayToGameover()
-    {
-        _isAllowJump = false;
-
-        _squareRb.velocity = Vector2.zero;
-        _spriteRenderer.enabled = false;
-        _squareRb.bodyType = RigidbodyType2D.Kinematic;
-        
-        _cacheTransform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
-        StateController.RaiseGameoverEvent();
+        EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
 
     /// <summary>
     /// Raise by InputManager in Hierarchy
     /// </summary>
-    public void Jump(InputAction.CallbackContext ctx)
+    public void ClickToJump(InputAction.CallbackContext ctx)
     {
-        if (_isFailedConfig)
-            return;
-
-        if (!_isAllowJump)
+        if (_isFailedConfig || !_isAllowJump)
             return;
 
         if (_isFirstJump)
         {
+            _isFirstJump = false;
             StateController.RaiseGameplayEvent();
 
-            _isFirstJump = false;
             return;
         }
 
         if (ctx.started)
-        {
-            // Jump to an exact height
-            var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2
-                * (Physics2D.gravity.y * _squareRb.gravityScale));
-
-            _squareRb.velocity = Vector2.zero;
-
-            if (_isCollided)
-            {
-                _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
-                Rotate360(ROTATE_VECTOR);
-            }
-            else
-            {
-                _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
-                Rotate360(-ROTATE_VECTOR);
-            }
-        }
+            Jump();
     }
 
-    private void Jump(bool isCollided)
+    private void JumpWhenCollided(object isFacingLeft)
     {
-        if (_isFailedConfig)
-            return;
+        _isFacingLeft = (bool)isFacingLeft;
 
-        _isCollided = isCollided;
+        Jump();
+    }
 
+    private void Jump()
+    {
         // Jump to an exact height
         var jumpForce = Mathf.Sqrt(_squareSO.JumpHeight * -2.0f
             * (Physics2D.gravity.y * _squareRb.gravityScale));
 
         _squareRb.velocity = Vector2.zero;
 
-        if (_isCollided)
+        if (_isFacingLeft)
         {
             _squareRb.AddForce(new Vector2(-_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
             Rotate360(ROTATE_VECTOR);
@@ -165,23 +108,71 @@ public class SquareMovement : StateBase
             _squareRb.AddForce(new Vector2(_squareSO.JumpLength, jumpForce), ForceMode2D.Impulse);
             Rotate360(-ROTATE_VECTOR);
         }
+
+        EventDispatcher.PostEvent(EventsID.SQUARE_MOVEMENT_SFX, _squareSO.GetSFXByName("Jump"));
+        EventDispatcher.PostEvent(EventsID.SQUARE_JUMP_VFX, _isFacingLeft);
     }
 
-    private void SetAllowJump()
+    private void SetAllowJump(object condition)
     {
-        _isAllowJump = true;
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.ALLOW_JUMP_SQUARE + "</color>");
+
+        _isAllowJump = (bool)condition;
+    }
+
+    private void SetFirstJump(object condition)
+    {
+        _isFirstJump = (bool)condition;
+    }
+
+    private void ShowSquare()
+    {
+        EventDispatcher.PostEvent(EventsID.SQUARE_MOVEMENT_SFX, _squareSO.GetSFXByName("Show"));
+
+        DOTween.Sequence()
+            .OnStart(() =>
+                {
+                    _transform.DOScale(new Vector2(0.8f, 0.8f), 1.0f).SetEase(Ease.OutBack);
+                    Rotate360(ROTATE_VECTOR);
+                })
+            .AppendInterval(1.2f)
+            .OnComplete(() => _isAllowJump = true);
+    }
+
+    private void HideSquare()
+    {
+        DOTween.Kill(_transform);
+
+        _isAllowJump = false;
+
+        _squareRb.velocity = Vector2.zero;
+        _squareRb.bodyType = RigidbodyType2D.Kinematic;
+
+        _transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        _transform.localScale = Vector3.zero;
+
     }
 
     private void Rotate360(Vector3 rotateVector)
     {
-        _cacheTransform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.WorldAxisAdd)
+        _transform.DORotate(rotateVector, _squareSO.RotateDuration, RotateMode.WorldAxisAdd)
             .SetEase(Ease.OutSine);
     }
 
     private void CacheComponents()
     {
-        _cacheTransform = transform;
+        _transform = transform;
         _squareRb = GetComponent<Rigidbody2D>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    private void CacheCallbacks()
+    {
+        _showSquareRef = (param) => ShowSquare();
+        _hideSquareRef = (param) => HideSquare();
+
+        _setAllowJumpRef = (param) => SetAllowJump(param);
+        _setFirstJumpRef = (param) => SetFirstJump(param);
+
+        _collidedSquareRef = (param) => JumpWhenCollided(param);
     }
 }

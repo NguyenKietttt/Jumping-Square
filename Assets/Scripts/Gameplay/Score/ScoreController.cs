@@ -1,47 +1,60 @@
 using System;
 using UnityEngine;
 
-public class ScoreController : StateBase
+public class ScoreController : MonoBehaviour
 {
-    public static event Action<int> displayScoreEvent;
+    private Action<object> _resetScoreRef, _collidedSquareRef;
 
 
     private int _totalScore;
     private bool _isStartJump;
 
 
+    private void Awake()
+    {
+        CacheEvents();
+    }
+
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
-
-        SquareCollision.OnBorderCollideEvent += param => UpdateScore();
+        EventDispatcher.RegisterListener(EventsID.RESET_SCORE, _resetScoreRef);
+        EventDispatcher.RegisterListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
     private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
-
-        SquareCollision.OnBorderCollideEvent -= param => UpdateScore();
+        EventDispatcher.RemoveListener(EventsID.RESET_SCORE, _resetScoreRef);
+        EventDispatcher.RemoveListener(EventsID.COLLIDED_SQUARE, _collidedSquareRef);
     }
 
 
-    public override void OnTitleMenu()
+    public void ResetScore(object score)
     {
-        _totalScore = 0;
+        CustomLogs.Instance.Log("<color=green> Listen " + EventsID.RESET_SCORE + "</color>");
+
+        _totalScore = (int) score;
         _isStartJump = true;
     }
 
 
-    public void UpdateScore()
+    private void UpdateScore()
     {
         if (_isStartJump)
         {
             _isStartJump = false;
             return;
         }
-        
-        _totalScore++;
 
-        displayScoreEvent?.Invoke(_totalScore);
+        if (_totalScore <= 99)
+            _totalScore++;
+        
+
+        EventDispatcher.PostEvent(EventsID.DISPLAY_SCORE, _totalScore);
+    }
+
+    private void CacheEvents()
+    {
+        _resetScoreRef = (param) => ResetScore(param);
+        _collidedSquareRef = (param) => UpdateScore();
     }
 }
