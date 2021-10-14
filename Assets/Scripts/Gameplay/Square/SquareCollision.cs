@@ -1,43 +1,49 @@
-using System.Collections;
 using System;
 using UnityEngine;
+using DG.Tweening;
 
 [RequireComponent(typeof(BoxCollider2D))]
-public class SquareCollision : StateBase
+public class SquareCollision : MonoBehaviour
 {
-    public static event Action<bool> OnBorderCollideEvent;
+    private Action<object> _setFirstCollided;
 
 
-    private BoxCollider2D boxCollider2D;
+    [Header("Configs")]
+    [SerializeField] private SquareSO _squareSO;
+
+    [Header("Validation")]
+    [SerializeField] private bool _isFailedConfig;
+
+    private Transform _transform;
+    private BoxCollider2D _boxCollider2D;
     private bool _isCollided;
-    
 
-    private void Awake() 
+
+    private void OnValidate()
     {
-        CacheComponents();
+        CustomLogs.Instance.Warning(_squareSO == null, "squareSO is missing!!!");
+
+        _isFailedConfig = _squareSO == null;
     }
 
+    private void Awake()
+    {
+        if (_isFailedConfig)
+            enabled = false;
+
+        CacheComponents();
+        CacheCallbacks();
+    }
 
     private void OnEnable()
     {
-        StateController.OnTitleEvent += OnTitleMenu;
-        StateController.OnGameplayEvent += OnGameplay;
+        EventDispatcher.RegisterListener(EventsID.FIRST_COLLIDED_SQUARE, _setFirstCollided);
     }
 
-    private void OnDisable() 
+    private void OnDisable()
     {
-        StateController.OnTitleEvent -= OnTitleMenu;
-        StateController.OnGameplayEvent -= OnGameplay;
+        EventDispatcher.RemoveListener(EventsID.FIRST_COLLIDED_SQUARE, _setFirstCollided);
     }
-
-
-    public override void OnGameplay()
-    {
-        _isCollided = RandomJumpDirection();
-
-        OnBorderCollideEvent?.Invoke(_isCollided);
-    }
-
 
     private void OnCollisionEnter2D(Collision2D other)
     {
@@ -45,31 +51,42 @@ public class SquareCollision : StateBase
         {
             _isCollided = !_isCollided;
 
-            OnBorderCollideEvent?.Invoke(_isCollided);
-
-            StartCoroutine(CheckDoubleJump());
+            EventDispatcher.PostEvent(EventsID.SQUARE_COLLIDE_SFX, _squareSO.GetSFXByName("Impact"));
+            EventDispatcher.PostEvent(EventsID.COLLIDED_SQUARE, _isCollided);
+            EventDispatcher.PostEvent(EventsID.SQUARE_COLLIDED_VFX, _isCollided);
+            
+            CheckDoubleCollided();
         }
     }
 
-
-    private void CacheComponents()
+    private void SetFirstCollided()
     {
-        boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
+        _isCollided = RandomJumpDirection();
+
+        EventDispatcher.PostEvent(EventsID.COLLIDED_SQUARE, _isCollided);
     }
 
-    private IEnumerator CheckDoubleJump()
+    private void CheckDoubleCollided()
     {
-        boxCollider2D.enabled = false;
-
-        yield return new WaitForSeconds(0.2f);
-
-        boxCollider2D.enabled = true;
+        DOTween.Sequence()
+            .AppendCallback(() => _boxCollider2D.enabled = false)
+            .AppendInterval(0.2f)
+            .OnComplete(() => _boxCollider2D.enabled = true);
     }
 
     private bool RandomJumpDirection()
     {
-        var result = (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
+        return (UnityEngine.Random.Range(0, 2) == 0) ? true : false;
+    }
 
-        return result;
+    private void CacheComponents()
+    {
+        _transform = GetComponent<Transform>();
+        _boxCollider2D = GetComponent<BoxCollider2D>();
+    }
+
+    private void CacheCallbacks()
+    {
+        _setFirstCollided = (param) => SetFirstCollided();
     }
 }

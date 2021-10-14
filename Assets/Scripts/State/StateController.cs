@@ -3,20 +3,38 @@ using UnityEngine;
 
 public class StateController : MonoBehaviour
 {
-    public static event Action OnTitleEvent;
-    public static event Action OnTitleToGameplayEvent;
-    public static event Action OnGameplayEvent;
-    public static event Action OnGameplayToGameoverEvent;
-    public static event Action OnGameoverEvent;
+    /// <summary>
+    /// Raise by RestartButton in Hierarchy
+    /// </summary>
+    public static void RaiseTitleState()
+    {
+        CustomLogs.Instance.Log("<color=green> Start" + EventsID.TITLE_STATE + "</color>");
+        EventDispatcher.PostEvent(EventsID.TITLE_STATE);
+    }
 
+    public static void RaiseTitleToGameplayState()
+    {
+        CustomLogs.Instance.Log("<color=green> End" + EventsID.TITLE_STATE + "</color>");
+        
+        CustomLogs.Instance.Log("<color=blue>" + EventsID.TITLE_TO_GAMEPLAY_STATE + "</color>");
+        EventDispatcher.PostEvent(EventsID.TITLE_TO_GAMEPLAY_STATE);
+    }
 
-    public static void RaiseTitleEvent() => OnTitleEvent?.Invoke();
+    public static void RaiseGameplayEvent()
+    {
+        CustomLogs.Instance.Log("<color=red>" + EventsID.GAMEPLAY_STATE + "</color>");
+        EventDispatcher.PostEvent(EventsID.GAMEPLAY_STATE);
+    }
 
-    public static void RaiseTitleToGameplayEvent() => OnTitleToGameplayEvent?.Invoke();
+    public static void RaiseOnGameplayToGameoverEvent()
+    {
+        CustomLogs.Instance.Log("<color=yellow>" + EventsID.GAMEPLAY_TO_GAMEOVER_STATE + "</color>");
+        EventDispatcher.PostEvent(EventsID.GAMEPLAY_TO_GAMEOVER_STATE);
+    }
 
-    public static void RaiseGameplayEvent() => OnGameplayEvent?.Invoke();
-
-    public static void RaiseOnGameplayToGameoverEvent() => OnGameplayToGameoverEvent?.Invoke();
-
-    public static void RaiseGameoverEvent() => OnGameoverEvent?.Invoke();
+    public static void RaiseGameoverEvent()
+    {
+        CustomLogs.Instance.Log("<color=white>" + EventsID.GAMEOVER_STATE + "</color>");
+        EventDispatcher.PostEvent(EventsID.GAMEOVER_STATE);
+    }
 }
